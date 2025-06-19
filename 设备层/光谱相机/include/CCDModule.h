@@ -16,11 +16,13 @@
 #include <dlfcn.h>
 #endif
 
-namespace CCDModule {
+namespace CCDModule 
+{
 	// =============================================================================
 	// 1. CCD抽象基类定义
 	// =============================================================================
-	class ICCDDevice {
+	class ICCDDevice 
+	{
 	public:
 		virtual ~ICCDDevice() = default;
 
