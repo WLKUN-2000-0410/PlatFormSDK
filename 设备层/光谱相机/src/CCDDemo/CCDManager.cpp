@@ -81,7 +81,9 @@ namespace CCDModule
 	void CCDManager::UnloadAllPlugins() {
 		CloseAllDevices();
 
-		for (auto& plugin : m_plugins) {
+		for (auto& plugin : m_plugins) 
+		{
+			plugin.second.factory.reset();
 			if (plugin.second.handle) {
 				FreeLibrary(plugin.second.handle);
 			}
