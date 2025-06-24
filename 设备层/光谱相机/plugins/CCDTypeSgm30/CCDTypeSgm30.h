@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include "Dependency\UserApplication.h"
 
 using namespace CCDModule;
 // =============================================================================
@@ -15,10 +16,23 @@ using namespace CCDModule;
 // =============================================================================
 class CCDTypeSgm30 : public ICCDDevice 
 {
+public:
+	explicit CCDTypeSgm30(const std::string& deviceId);
+	virtual ~CCDTypeSgm30();
+
+	// ICCDDevice接口实现
+	bool   Connect();
+	bool   DisConnect();
+	bool   SetExposureTime(double timeMs) override;
+	bool   SetGain(double gain) override;
+	bool   SetTemperature(double temperature) override;
+
+	double GetExposureTime() const override;
+	double GetGain() const override;
+
 private:
 	std::string m_deviceId;
 	std::string m_serialNumber;
-	bool m_connected;
 
 	// 设备参数
 	double m_exposureTime;
@@ -36,22 +50,13 @@ private:
 
 	// 内部方法
 	void CaptureThreadFunc();
-
-public:
-	explicit CCDTypeSgm30(const std::string& deviceId);
-	virtual ~CCDTypeSgm30();
-
-	// ICCDDevice接口实现
-	bool   Connect();
-	bool   DisConnect();
-	bool   SetExposureTime(double timeMs) override;
-	bool   SetGain(double gain) override;
-	bool   SetTemperature(double temperature) override;
-
-	double GetExposureTime() const override;
-	double GetGain() const override;
-
-	bool  setAB(const float &p);
+private:
+	void*           _handle;
+	unsigned short  _binning_x;
+	unsigned int    _average;
+	bool            _opened;
+	unsigned int    _exposure;
+	unsigned short  _pixels;
 };
 
 class CCDTypeSgm30Factory : public ICCDFactory

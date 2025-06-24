@@ -5,13 +5,15 @@
 // =============================================================================
 #include "CCDTypeSgm30.h"
 
+
 CCDTypeSgm30::CCDTypeSgm30(const std::string& deviceId)
 	: m_deviceId(deviceId)
-	, m_connected(false)
+	, _opened(false)
 	, m_exposureTime(100.0)
 	, m_gain(1.0)
 	, m_temperature(-10.0)
 	, m_shouldStop(false)
+	, _handle(nullptr)
 {
 }
 
@@ -21,17 +23,61 @@ CCDTypeSgm30::~CCDTypeSgm30() {
 
 
 bool CCDTypeSgm30::Connect()
-{
+{	
+	unsigned int status, device_num, i;
+	//get compatible VID and PID
+	unsigned int buffersize = 2;
+	unsigned int VIDPID[4];
+	//VIDPID = new unsigned int [4];
+	VIDPID[0] = 4292;
+	VIDPID[1] = 60001;
+	VIDPID[2] = 1592;
+	VIDPID[3] = 2732;
+
+	_handle = nullptr;
+	_opened = false;
+	//get all device numbers
+	for (unsigned int j = 0; j<buffersize * 2; j = j + 2)
+	{
+		device_num = 0;
+		status = UAI_SpectrometerGetDeviceAmount(VIDPID[j], VIDPID[j + 1], &device_num);
+		if (status == 0 && device_num > 0) // API_SUCCESS == status
+		{
+			for (i = 0; i<device_num; i++)
+			{
+				status = UAI_SpectrometerOpen(i, &_handle, VIDPID[j], VIDPID[j + 1]);
+				if (status == 0)
+				{
+					//pixels
+					UAI_SpectromoduleGetFrameSizeRaw(_handle, &_pixels);
+					_binning_x = 2;
+
+				//	get_exposure(&_exposure);
+					_average = 1;
+					_opened = true;
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 
 bool CCDTypeSgm30::DisConnect()
 {
-	return false;
+	auto ret = UAI_SpectrometerSetExternalPort(_handle, 0);
+	if (API_SUCCESS != ret) return ret;
+
+	ret = UAI_SpectrometerClose(_handle);
+	if (API_SUCCESS != ret) return ret;
+
+	_opened = false;
+	return API_SUCCESS;
 }
 
 bool CCDTypeSgm30::SetExposureTime(double timeMs) {
-	if (!m_connected) return false;
+	if (!_opened) return false;
 
 	if (TypeA_SetExposure(timeMs)) {
 		m_exposureTime = timeMs;
@@ -41,7 +87,7 @@ bool CCDTypeSgm30::SetExposureTime(double timeMs) {
 }
 
 bool CCDTypeSgm30::SetGain(double gain) {
-	if (!m_connected) return false;
+	if (!_opened) return false;
 
 /*	if (TypeA_SetGain(gain)) {
 		m_gain = gain;
@@ -51,7 +97,7 @@ bool CCDTypeSgm30::SetGain(double gain) {
 }
 
 bool CCDTypeSgm30::SetTemperature(double temperature) {
-	if (!m_connected) return false;
+	if (!_opened) return false;
 
 	// TypeA特定的温度控制逻辑
 	m_temperature = temperature;
@@ -66,10 +112,6 @@ double CCDTypeSgm30::GetGain() const {
 	return m_gain;
 }
 
-bool CCDTypeSgm30::setAB(const float & p)
-{
-	return false;
-}
 
 void CCDTypeSgm30::CaptureThreadFunc() {
 	//const size_t imageSize = m_roiWidth * m_roiHeight * 2; // 假设16位图像
