@@ -157,7 +157,7 @@ namespace CCDModule
 
 	void CCDManager::CloseAllDevices() {
 		for (auto& device : m_devices) {
-//			device.second->Finalize();
+			device.second->DisConnect();
 		}
 		m_devices.clear();
 	}

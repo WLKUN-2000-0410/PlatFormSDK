@@ -10,8 +10,6 @@ CCDTypeSgm30::CCDTypeSgm30(const std::string& deviceId)
 	: m_deviceId(deviceId)
 	, _opened(false)
 	, m_exposureTime(100.0)
-	, m_gain(1.0)
-	, m_temperature(-10.0)
 	, m_shouldStop(false)
 	, _handle(nullptr)
 {
@@ -86,32 +84,10 @@ bool CCDTypeSgm30::SetExposureTime(double timeMs) {
 	return false;
 }
 
-bool CCDTypeSgm30::SetGain(double gain) {
-	if (!_opened) return false;
-
-/*	if (TypeA_SetGain(gain)) {
-		m_gain = gain;
-		return true;
-	}*/
-	return false;
-}
-
-bool CCDTypeSgm30::SetTemperature(double temperature) {
-	if (!_opened) return false;
-
-	// TypeA特定的温度控制逻辑
-	m_temperature = temperature;
-	return true;
-}
 
 double CCDTypeSgm30::GetExposureTime() const {
 	return m_exposureTime;
 }
-
-double CCDTypeSgm30::GetGain() const {
-	return m_gain;
-}
-
 
 void CCDTypeSgm30::CaptureThreadFunc() {
 	//const size_t imageSize = m_roiWidth * m_roiHeight * 2; // 假设16位图像
@@ -154,7 +130,6 @@ std::vector<std::string> CCDTypeSgm30Factory::EnumerateDevices()
 	// 模拟设备枚举
 	std::vector<std::string> devices;
 	devices.push_back("Device001");
-	devices.push_back("Device002");
 	return devices;
 }
 

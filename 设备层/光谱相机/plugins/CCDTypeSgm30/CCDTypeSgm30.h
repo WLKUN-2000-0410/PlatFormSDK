@@ -24,11 +24,7 @@ public:
 	bool   Connect();
 	bool   DisConnect();
 	bool   SetExposureTime(double timeMs) override;
-	bool   SetGain(double gain) override;
-	bool   SetTemperature(double temperature) override;
-
 	double GetExposureTime() const override;
-	double GetGain() const override;
 
 private:
 	std::string m_deviceId;
@@ -36,8 +32,6 @@ private:
 
 	// 设备参数
 	double m_exposureTime;
-	double m_gain;
-	double m_temperature;
 
 	// 采集线程相关
 	std::thread m_captureThread;

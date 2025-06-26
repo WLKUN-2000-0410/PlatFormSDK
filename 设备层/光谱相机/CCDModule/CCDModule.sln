@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCDTypeA4", "..\plugins\CCD
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCDTypeC2", "..\plugins\CCDTypeC2\CCDTypeC2.vcxproj", "{1F2820B5-1EC8-4375-B674-279E17D068D3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCDTypeVirtual", "..\plugins\CCDTypeVirtual\CCDTypeVirtual.vcxproj", "{A2273AE5-6FF8-4A7A-90B4-425612065D40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{1F2820B5-1EC8-4375-B674-279E17D068D3}.Release|x64.Build.0 = Release|x64
 		{1F2820B5-1EC8-4375-B674-279E17D068D3}.Release|x86.ActiveCfg = Release|Win32
 		{1F2820B5-1EC8-4375-B674-279E17D068D3}.Release|x86.Build.0 = Release|Win32
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Debug|x64.ActiveCfg = Debug|x64
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Debug|x64.Build.0 = Debug|x64
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Debug|x86.ActiveCfg = Debug|Win32
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Debug|x86.Build.0 = Debug|Win32
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Release|x64.ActiveCfg = Release|x64
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Release|x64.Build.0 = Release|x64
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Release|x86.ActiveCfg = Release|Win32
+		{A2273AE5-6FF8-4A7A-90B4-425612065D40}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
