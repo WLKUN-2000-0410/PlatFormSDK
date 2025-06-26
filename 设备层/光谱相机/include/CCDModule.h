@@ -30,12 +30,30 @@ namespace CCDModule
 		virtual bool   Connect()=0;
 		virtual bool   DisConnect() = 0;
 		virtual bool   SetExposureTime(double timeMs) = 0;
-		virtual bool   SetTemperature(double temperature) = 0;
 		virtual double GetExposureTime() const = 0;
-		virtual bool   SetGain(double gain) = 0;
-		virtual double GetGain() const = 0;
+
+		// 虚函数 - 提供默认实现，子类可以重写
+		virtual bool HasCoolingModule() const { return false; }
+		virtual bool HasGainModule() const { return false; }
+	};
+	// 制冷功能接口
+	class ICoolingModule 
+	{
+	public:
+		virtual ~ICoolingModule() = default;
+		virtual bool SetCoolingTemperature(double temp) = 0;
+		virtual double GetCurrentTemperature() = 0;
+		virtual bool EnableCooling(bool enable) = 0;
 	};
 
+	// 增益功能接口
+	class IGainModule 
+	{
+	public:
+		virtual ~IGainModule() = default;
+		virtual bool SetGain(int gain) = 0;
+		virtual int GetGain() = 0;
+	};
 	// =============================================================================
 	// 2. 设备工厂接口
 	// =============================================================================
