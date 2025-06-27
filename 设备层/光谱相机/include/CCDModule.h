@@ -30,7 +30,9 @@ namespace CCDModule
 		virtual bool   Connect()=0;
 		virtual bool   DisConnect() = 0;
 		virtual bool   SetExposureTime(double timeMs) = 0;
-		virtual double GetExposureTime() const = 0;
+		virtual bool   GetExposureTime(double* timeMs) = 0;
+		virtual bool   GetPixelNum(int* size) = 0;
+		virtual bool   GetAcquiredData(unsigned short * buff, unsigned long size) = 0;
 
 		// 虚函数 - 提供默认实现，子类可以重写
 		virtual bool HasCoolingModule() const { return false; }

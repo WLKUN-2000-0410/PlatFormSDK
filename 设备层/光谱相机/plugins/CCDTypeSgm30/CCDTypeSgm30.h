@@ -21,11 +21,12 @@ public:
 	virtual ~CCDTypeSgm30();
 
 	// ICCDDevice接口实现
-	bool   Connect();
-	bool   DisConnect();
+	bool   Connect() override;
+	bool   DisConnect() override;
 	bool   SetExposureTime(double timeMs) override;
-	double GetExposureTime() const override;
-
+	bool   GetExposureTime(double* timeMs) override;
+	bool   GetPixelNum(int* size) override;
+	bool   GetAcquiredData(unsigned short * buff, unsigned long size) override;
 private:
 	std::string m_deviceId;
 	std::string m_serialNumber;

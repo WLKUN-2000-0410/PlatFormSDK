@@ -51,6 +51,8 @@ bool CCDTypeSgm30::Connect()
 					_binning_x = 2;
 
 				//	get_exposure(&_exposure);
+					double exptime = 0;
+					GetExposureTime(&exptime);
 					_average = 1;
 					_opened = true;
 					return true;
@@ -74,19 +76,68 @@ bool CCDTypeSgm30::DisConnect()
 	return API_SUCCESS;
 }
 
-bool CCDTypeSgm30::SetExposureTime(double timeMs) {
+bool CCDTypeSgm30::SetExposureTime(double timeMs) 
+{
 	if (!_opened) return false;
 
-	if (TypeA_SetExposure(timeMs)) {
-		m_exposureTime = timeMs;
+	int us = timeMs*1e3;
+	return (UAI_SpectrometerSetIntegrationTime(_handle, us) == API_SUCCESS);
+}
+
+bool CCDTypeSgm30::GetExposureTime(double * timeMs) 
+{
+	if (!_opened) return false;
+	unsigned int us = 0;
+	if (API_SUCCESS == UAI_SpectrometerGetIntegrationTime(_handle, &us))
+	{
+		_exposure = us;
+		*timeMs = us / 1000.0;
 		return true;
 	}
 	return false;
 }
 
+bool CCDTypeSgm30::GetPixelNum(int * size)
+{
+	if (!_opened) return false;
+	*size = _pixels;
+	return true;
+}
 
-double CCDTypeSgm30::GetExposureTime() const {
-	return m_exposureTime;
+bool CCDTypeSgm30::GetAcquiredData(unsigned short * buff, unsigned long size)
+{
+	if (!_opened) return false;
+
+	if (!buff || size == 0 || !_handle) 
+	{
+		return false;
+	}
+
+	std::vector<float> vbuffer(size,0.0);
+	int ret = UAI_SpectrometerDataOneshotRaw(_handle, _exposure, vbuffer.data(), /*_average*/1);
+	if (ret == 0x80000005)
+	{
+		return false;
+	}
+	for (size_t i = 0; i < size; i++)
+	{
+		float value = vbuffer[i];
+
+		// °²È«×ª»»
+		if (value < 0.0f) 
+		{
+			buff[i] = 0;
+		}
+		else if (value > 65535.0f) 
+		{
+			buff[i] = 65535;
+		}
+		else 
+		{
+			buff[i] = static_cast<unsigned short>(std::round(value));
+		}
+	}
+	return true;
 }
 
 void CCDTypeSgm30::CaptureThreadFunc() {

@@ -40,6 +40,8 @@ public:
 	bool HasGainModule() const { return true; }
 
 private:
+
+private:
 	std::string m_deviceId;
 	std::string m_serialNumber;
 

@@ -33,26 +33,35 @@ int main()
 				ICoolingModule *CoolDevice = dynamic_cast<ICoolingModule*>(ccd1);
 				CoolDevice->SetCoolingTemperature(-10.0);
 			}
-		}
+			int size = 0;
+			if (ccd1->GetPixelNum(&size))
+			{
+				std::vector<unsigned short> vbuff(size, 0);
+				 
+				ccd1->GetAcquiredData(vbuff.data(), size);
 
-	}
-	if (ccdManager.OpenDevice("DFiled:Device001", "CCD1")) {
-		ICCDDevice* ccd1 = ccdManager.GetDevice("CCD1");
-		if (ccd1) {
-			ccd1->Connect();
-			if (ccd1->HasCoolingModule())
-			{
-				IGainModule *GainDevice = dynamic_cast<IGainModule*>(ccd1);
-				GainDevice->SetGain(1);
-			}
-			if (ccd1->HasCoolingModule())
-			{
-				ICoolingModule *CoolDevice = dynamic_cast<ICoolingModule*>(ccd1);
-				CoolDevice->SetCoolingTemperature(-10.0);
+				int a = 9;
 			}
 		}
 
 	}
+	//if (ccdManager.OpenDevice("DFiled:Device001", "CCD1")) {
+	//	ICCDDevice* ccd1 = ccdManager.GetDevice("CCD1");
+	//	if (ccd1) {
+	//		ccd1->Connect();
+	//		if (ccd1->HasCoolingModule())
+	//		{
+	//			IGainModule *GainDevice = dynamic_cast<IGainModule*>(ccd1);
+	//			GainDevice->SetGain(1);
+	//		}
+	//		if (ccd1->HasCoolingModule())
+	//		{
+	//			ICoolingModule *CoolDevice = dynamic_cast<ICoolingModule*>(ccd1);
+	//			CoolDevice->SetCoolingTemperature(-10.0);
+	//		}
+	//	}
+
+	//}
 
 	// ÅúÁ¿²Ù×÷
 	ccdManager.SetExposureTimeAll(200.0);

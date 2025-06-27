@@ -14,14 +14,56 @@ CCDTypeA2::CCDTypeA2(const std::string& deviceId)
 {
 }
 
-CCDTypeA2::~CCDTypeA2() {
+CCDTypeA2::~CCDTypeA2() 
+{
 
 }
 
 
 bool CCDTypeA2::Connect()
 {
+	do {
+		auto cwd = std::string("");
+		int ret = Initialize((char*)cwd.c_str());
+		if (DRV_SUCCESS != ret) break;
 
+		long dev_count = 0;
+		GetAvailableCameras(&dev_count);
+
+		if (dev_count <= 0) break;
+
+		for (int i = 0; i < dev_count; i++) {
+			long handle = -1;
+			if (DRV_SUCCESS == GetCameraHandle(i, &handle)) {
+				if (DRV_SUCCESS == SetCurrentCamera(handle)) {
+					_cameras.push_back(handle);
+				}
+			}
+		}
+		SetFullImage(1, 1);
+
+		is_opened(true);
+
+		std::vector<float> gain;
+		enum_gains(gain);
+
+		set_gain(gain.size() - 1);
+
+		set_read_mode(FVB);
+		set_acquisition_mode(SINGLE);
+
+		_bin_h = _bin_v = 1;
+
+		get_detector_size(&_width, &_height);
+
+		_roi_h_start = 1; _roi_h_end = _width;
+		_roi_v_start = 1; _roi_v_end = _height;
+
+		_read_mode = FVB;
+		_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		return true;
+	} while (false);
 	return false;
 }
 
