@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CCDFactory" Collapsed="true">
+    <Position X="9.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAIAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CCDFactory.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCDManager" Collapsed="true">
+    <Position X="7.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>SAAAAAABAAAAAAAAAAAAAAAABAAAMIiAAAAACAAAAAA=</HashCode>
+      <FileName>CCDManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCDTypeC2" Collapsed="true">
+    <Position X="2.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAAQBAAAAAAIAEAQAAAAAACAAAAAAAQAA=</HashCode>
+      <FileName>CCDTypeC2.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCDTypeSgm30" Collapsed="true">
+    <Position X="5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAMAAAAAQBAAAAAAIAEAAAAAAAAAAAABAAAQAA=</HashCode>
+      <FileName>CCDTypeSgm30.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCDConfigManager" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAABEBAAAAAgAiIBAAAAAAAIAAAgQAEAAA=</HashCode>
+      <FileName>CDConfigManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCDBase" Collapsed="true">
+    <Position X="2.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BACBAAAEAAAAAQFgAIEAAJAEAAAACAAAAAIAAIAAQhA=</HashCode>
+      <FileName>CCDInterface.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cvirtualccd" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAAQBAAgAAAIBEAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Cvirtualccd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="CCDConfig" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAEAQAAAAAAAAIAAAAACABAAgAAAAAAACAAAA=</HashCode>
+      <FileName>CCDTypes.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CCDResult" Collapsed="true">
+    <Position X="9.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAQAAAAACA=</HashCode>
+      <FileName>CCDTypes.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="CCDType" Collapsed="true">
+    <Position X="7.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAEAAABAAAAAAAAAAAAAIACAIAAAAAJAAAAAIAAAAA=</HashCode>
+      <FileName>CCDTypes.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>
