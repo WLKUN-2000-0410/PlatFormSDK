@@ -31,7 +31,14 @@ bool CCDConfigManager::LoadConfig(const std::string & filePath)
 
 bool CCDConfigManager::SaveConfig(const std::string & filePath)
 {
-	return false;
+	std::ofstream file(filePath);
+	if (!file.is_open()) {
+		LogPrintErr("Failed to open config file for writing: " + filePath);
+		return false;
+	}
+	file << GenerateConfigContent();
+	file.close();
+	return true;
 }
 
 CCDConfig CCDConfigManager::GetDeviceConfig(CCDType type) const
@@ -49,6 +56,7 @@ CCDConfig CCDConfigManager::GetDeviceConfig(CCDType type) const
 
 void CCDConfigManager::SetDeviceConfig(CCDType type, const CCDConfig & config)
 {
+	m_deviceConfigs[type] = config;
 }
 
 std::string CCDConfigManager::GetGlobalParameter(const std::string & key) const
@@ -78,6 +86,56 @@ void CCDConfigManager::initLog()
 std::shared_ptr<spdlog::logger> CCDConfigManager::getLogHandle()
 {
 	return logger;
+}
+
+bool CCDConfigManager::EnsureConfigFile()
+{
+	std::vector<std::string> configPaths =
+	{
+		"./Ccd_config.json",
+		//"./config/config.ini",
+		//"C:/CCDModule/config.ini"
+	};
+
+	auto& configMgr = CCDConfigManager::GetInstance();
+
+	// 尝试加载现有配置文件
+	for (const auto& path : configPaths)
+	{
+		if (configMgr.LoadConfig(path))
+		{
+			LogPrintInfo("Config loaded from: {0}", path);
+			return true;
+		}
+	}
+
+	// 如果没有找到配置文件，创建默认配置
+	LogPrintInfo("No config file found, creating default config");
+
+	// 设置全局默认参数
+	configMgr.SetGlobalParameter("DefaultCCDType", "SGM30");
+
+	// 设置各设备默认配置
+	CCDConfig  sgm30Config;
+	sgm30Config.type = CCDType::SGM30;
+	sgm30Config.Dependentfiles.push_back("UserApplication.dll");
+	sgm30Config.Dependentfiles.push_back("SiUSBXp.dll");
+	sgm30Config.Dependentfiles.push_back("DeviceLibrary.dll");
+	sgm30Config.defaultExposureTime = 100.0;
+	sgm30Config.defaulttemperature = 20.5;
+	sgm30Config.defaultgain = 1;
+	configMgr.SetDeviceConfig(CCDType::SGM30, sgm30Config);
+
+	//CCDConfig c2Config(CCDType::C2);
+	//c2Config.deviceName = "C2_Device";
+	//c2Config.port = "COM4";
+	//c2Config.baudRate = 9600;
+	//c2Config.defaultExposureTime = 50.0;
+	//c2Config.pixelNum = 1024;
+	//configMgr.SetDeviceConfig(CCDType::C2, c2Config);
+
+	// 保存默认配置
+	return configMgr.SaveConfig("./Ccd_config.json");
 }
 
 bool CCDConfigManager::ParseConfigFile(const std::string & content)
@@ -171,5 +229,25 @@ bool CCDConfigManager::ParseConfigFile(const std::string & content)
 
 std::string CCDConfigManager::GenerateConfigContent() const
 {
-	return std::string();
+	json j;
+	j["Global"] = json::object();
+	for (std::map<std::string, std::string>::const_iterator it = m_globalParams.begin();
+		it != m_globalParams.end(); ++it) {
+		j["Global"][it->first] = it->second;
+	}
+	j["Devices"] = json::object();
+	for (std::map<CCDType, CCDConfig>::const_iterator it = m_deviceConfigs.begin();
+		it != m_deviceConfigs.end(); ++it) {
+		json cfg;
+		cfg["Dependentfiles"] = json::array();
+		for (std::vector<std::string>::const_iterator file_it = it->second.Dependentfiles.begin();
+			file_it != it->second.Dependentfiles.end(); ++file_it) {
+			cfg["Dependentfiles"].push_back(*file_it);
+		}
+		cfg["DefaultExposureTime"] = it->second.defaultExposureTime;
+		cfg["Defaulttemperature"] = it->second.defaulttemperature;
+		cfg["Defaultgain"] = it->second.defaultgain;
+		j["Devices"][CCDTypeToString(it->first)] = cfg;
+	}
+	return j.dump(2); // 格式化输出，缩进2空格
 }

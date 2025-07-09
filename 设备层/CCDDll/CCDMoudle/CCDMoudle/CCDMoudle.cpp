@@ -17,59 +17,6 @@
 #include "GlobalShare.h"
 
 
-// 内部辅助函数
-namespace {
-	// 检查配置文件并创建默认配置
-	bool EnsureConfigFile() 
-	{
-		std::vector<std::string> configPaths = 
-		{
-			"./Ccd_config.json",
-			//"./config/config.ini",
-			//"C:/CCDModule/config.ini"
-		};
-
-		auto& configMgr = CCDConfigManager::GetInstance();
-
-		// 尝试加载现有配置文件
-		for (const auto& path : configPaths) 
-		{
-			if (configMgr.LoadConfig(path)) 
-			{
-				LogPrintInfo("Config loaded from: " + path);
-				return true;
-			}
-		}
-
-		// 如果没有找到配置文件，创建默认配置
-		LogPrintInfo("No config file found, creating default config");
-
-		// 设置全局默认参数
-		configMgr.SetGlobalParameter("DefaultCCDType", "SGM30");
-
-		// 设置各设备默认配置
-		CCDConfig  sgm30Config;
-		sgm30Config.type = CCDType::SGM30;
-		sgm30Config.Dependentfiles.push_back("UserApplication.dll");
-		sgm30Config.Dependentfiles.push_back("SiUSBXp.dll");
-		sgm30Config.Dependentfiles.push_back("DeviceLibrary.dll");
-		sgm30Config.defaultExposureTime = 100.0;
-		sgm30Config.defaulttemperature = 20.5;
-		sgm30Config.defaultgain = 1;
-		configMgr.SetDeviceConfig(CCDType::SGM30, sgm30Config);
-
-		//CCDConfig c2Config(CCDType::C2);
-		//c2Config.deviceName = "C2_Device";
-		//c2Config.port = "COM4";
-		//c2Config.baudRate = 9600;
-		//c2Config.defaultExposureTime = 50.0;
-		//c2Config.pixelNum = 1024;
-		//configMgr.SetDeviceConfig(CCDType::C2, c2Config);
-
-		// 保存默认配置
-		return configMgr.SaveConfig("./Ccd_config.json");
-	}
-}
 API_CCD_Moudle_H bool InitDll()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
@@ -82,16 +29,14 @@ API_CCD_Moudle_H bool InitDll()
 		}
 		LogPrintInfo("Starting DLL initialization");
 
+		// 1. 获取配置管理器
+		auto& configMgr = CCDConfigManager::GetInstance();
 
-		// 1. 确保配置文件存在并加载
-		if (!EnsureConfigFile()) {
+		// 2. 确保配置文件存在并加载
+		if (!configMgr.EnsureConfigFile()) {
 			LogPrintErr("Failed to load or create config file");
 			return false;
 		}
-
-		// 2. 获取配置管理器
-		auto& configMgr = CCDConfigManager::GetInstance();
-
 		// 3. 获取默认CCD类型
 		std::string typeStr = configMgr.GetGlobalParameter("DefaultCCDType");
 		if (typeStr.empty()) {

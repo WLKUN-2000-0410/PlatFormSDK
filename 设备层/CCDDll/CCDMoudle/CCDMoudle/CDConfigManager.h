@@ -45,7 +45,8 @@ public:
 	void initLog();
 	//
 	std::shared_ptr<spdlog::logger>  getLogHandle();
-
+	// 检查配置文件并创建默认配置
+	bool EnsureConfigFile();
 private:
 	std::map<CCDType, CCDConfig> m_deviceConfigs;
 	std::map<std::string, std::string> m_globalParams;
