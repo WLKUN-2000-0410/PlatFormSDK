@@ -44,6 +44,7 @@ public:
 	void initLog();
 	//
 	std::shared_ptr<spdlog::logger>  getLogHandle();
+
 private:
 	std::map<CCDType, CCDConfig> m_deviceConfigs;
 	std::map<std::string, std::string> m_globalParams;

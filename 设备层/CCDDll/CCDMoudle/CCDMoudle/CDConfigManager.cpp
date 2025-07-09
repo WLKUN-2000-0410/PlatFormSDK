@@ -67,6 +67,7 @@ void CCDConfigManager::initLog()
 {
 	logger = spdlog::basic_logger_mt("realtime_logger", "log.txt");
 	logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%L%$] [thread %t] %v"); // 设置日志格式
+	logger->set_level(spdlog::level::info);
 	logger->flush_on(spdlog::level::info); // 设置在info级别以上的日志才会刷新到文件
 	spdlog::set_default_logger(logger); // 设置默认日志对象
 

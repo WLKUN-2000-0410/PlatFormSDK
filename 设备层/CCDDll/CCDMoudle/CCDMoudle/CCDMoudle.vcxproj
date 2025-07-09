@@ -157,6 +157,7 @@
     <ClInclude Include="CCDTypeSgm30.h" />
     <ClInclude Include="CDConfigManager.h" />
     <ClInclude Include="Cvirtualccd.h" />
+    <ClInclude Include="GlobalShare.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +183,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GlobalShare.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram3.cd" />
