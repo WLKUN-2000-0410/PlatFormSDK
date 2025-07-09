@@ -13,6 +13,7 @@ CCDConfigManager::CCDConfigManager()
 
 CCDConfigManager::~CCDConfigManager()
 {
+
 }
 
 bool CCDConfigManager::LoadConfig(const std::string & filePath)

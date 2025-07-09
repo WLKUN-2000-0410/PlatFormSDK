@@ -2,6 +2,7 @@
 #include "CCDFactory.h"
 #include "CCDTypeSgm30.h"
 #include "CCDTypeC2.h"
+#include "Cvirtualccd.h"
 
 
 
@@ -13,6 +14,8 @@ std::shared_ptr<CCDBase> CCDFactory::CreateDevice(CCDType type)
 		return std::make_shared<CCDTypeSgm30>();
 	case CCDType::C2:
 		return std::make_shared<CCDTypeC2>();
+	case CCDType::VIRTUAL:
+		return std::make_shared<Cvirtualccd>();
 	default:
 		return nullptr;
 	}

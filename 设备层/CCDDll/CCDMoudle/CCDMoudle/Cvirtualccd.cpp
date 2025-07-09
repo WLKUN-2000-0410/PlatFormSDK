@@ -13,7 +13,7 @@ Cvirtualccd::~Cvirtualccd()
 
 bool Cvirtualccd::Initialize(const CCDConfig & config)
 {
-	return false;
+	return true;
 }
 
 bool Cvirtualccd::IsConnected()

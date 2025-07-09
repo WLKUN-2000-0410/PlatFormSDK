@@ -40,7 +40,7 @@ API_CCD_Moudle_H bool InitDll()
 		// 3. 获取默认CCD类型
 		std::string typeStr = configMgr.GetGlobalParameter("DefaultCCDType");
 		if (typeStr.empty()) {
-			typeStr = "SGM30"; // 如果没有配置，使用默认值
+			typeStr = "VIRTUAL"; // 如果没有配置，使用默认值
 		}
 
 		GlobalShare::g_currentType = StringToCCDType(typeStr);
@@ -55,10 +55,25 @@ API_CCD_Moudle_H bool InitDll()
 
 		// 5. 获取设备配置并初始化
 		CCDConfig config = configMgr.GetDeviceConfig(GlobalShare::g_currentType);
-		if (!GlobalShare::g_currentDevice->Initialize(config)) {
+		if (!GlobalShare::g_currentDevice->Initialize(config)) 
+		{
 			LogPrintErr("Failed to initialize CCD device");
 			GlobalShare::g_currentDevice.reset();
-			return false;
+
+			//如果初始化失败，自动切换到virtual虚拟设备
+			LogPrintInfo("Switch to the virtual device.");
+			GlobalShare::g_currentType = CCDType::VIRTUAL;
+			typeStr = "VIRTUAL";
+			GlobalShare::g_currentDevice = CCDFactory::CreateDevice(GlobalShare::g_currentType);
+			if (!GlobalShare::g_currentDevice) {
+				LogPrintErr("Failed to create VIRTUAL device");
+				return false;
+			}
+			CCDConfig config = configMgr.GetDeviceConfig(GlobalShare::g_currentType);
+			if (!GlobalShare::g_currentDevice->Initialize(config)) {
+				LogPrintErr("Failed to initialize VIRTUAL device");
+				return false;
+			}
 		}
 
 		GlobalShare::g_initialized = true;
