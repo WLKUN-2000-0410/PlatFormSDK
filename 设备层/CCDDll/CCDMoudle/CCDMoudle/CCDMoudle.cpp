@@ -29,15 +29,12 @@ API_CCD_Moudle_H bool InitDll()
 		}
 		LogPrintInfo("Starting DLL initialization");
 
-		// 1. 获取配置管理器
 		auto& configMgr = CCDConfigManager::GetInstance();
 
-		// 2. 确保配置文件存在并加载
 		if (!configMgr.EnsureConfigFile()) {
 			LogPrintErr("Failed to load or create config file");
 			return false;
 		}
-		// 3. 获取默认CCD类型
 		std::string typeStr = configMgr.GetGlobalParameter("DefaultCCDType");
 		if (typeStr.empty()) {
 			typeStr = "VIRTUAL"; // 如果没有配置，使用默认值
@@ -46,21 +43,18 @@ API_CCD_Moudle_H bool InitDll()
 		GlobalShare::g_currentType = StringToCCDType(typeStr);
 		LogPrintInfo("Selected CCD type: " + typeStr);
 
-		// 4. 创建CCD设备实例
 		GlobalShare::g_currentDevice = CCDFactory::CreateDevice(GlobalShare::g_currentType);
 		if (!GlobalShare::g_currentDevice) {
 			LogPrintErr("Failed to create CCD device of type: " + typeStr);
 			return false;
 		}
 
-		// 5. 获取设备配置并初始化
 		CCDConfig config = configMgr.GetDeviceConfig(GlobalShare::g_currentType);
 		if (!GlobalShare::g_currentDevice->Initialize(config)) 
 		{
 			LogPrintErr("Failed to initialize CCD device");
 			GlobalShare::g_currentDevice.reset();
 
-			//如果初始化失败，自动切换到virtual虚拟设备
 			LogPrintInfo("Switch to the virtual device.");
 			GlobalShare::g_currentType = CCDType::VIRTUAL;
 			typeStr = "VIRTUAL";

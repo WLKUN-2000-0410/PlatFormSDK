@@ -2,6 +2,7 @@
 #include "CCDInterface.h"
 #include "CCDTypes.h"
 #include <Windows.h>
+#include "DllInterface.h"
 
 
 class CCDTypeSgm30 : public CCDBase
@@ -18,11 +19,35 @@ public:
 	bool   GetExposureTime(double* timeMs);
 	bool   GetPixelNum(int* size);
 
+
 private:
-	std::vector<HMODULE> m_dlls; // 存储加载的DLL句柄
-	double m_exposureTime; // 当前曝光时间
-	double m_temperature;  // 当前温度
-	int m_gain;           // 当前增益
-	bool m_isConnected;   // 连接状态
+	bool   initDll();
+	void   loadDllFun();
+private:
+	HINSTANCE	Handle;      
+	double		m_exposureTime; 
+	double		m_temperature;  
+	int			m_gain;           
+	bool		m_isConnected;   
+
+
+	DLL_OutER_inUI1_inUI2_inUIp3				UAI_SpectrometerGetDeviceAmount;
+	DLL_OutER_inUI1_inVpp2_inUI3_inUI4			UAI_SpectrometerOpen;
+	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSizeRaw;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetExternalPort;
+	DLL_OutER_inVp1								UAI_SpectrometerClose;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetIntegrationTime;
+	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetIntegrationTime;
+	DLL_OutER_inVp1_inUI2_infp3_inUI4			UAI_SpectrometerDataOneshotRaw;
+	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerGetUserRom;
+	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerSetUserRom;
+	DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5    UAI_SpectromoduleGetIntensityCalibration;
+	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSize;
+	DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5		UAI_SpectromoduleSetIntensityCalibration;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerBlockModeStartStop;
+	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetExternalPort;
+	DLL_OutER_inVp1_inUI2_inUI3_inUI4			UAI_SpectrometerSetTriggerIO;
+
+
 };
 

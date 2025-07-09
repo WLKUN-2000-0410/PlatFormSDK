@@ -157,6 +157,7 @@
     <ClInclude Include="CCDTypeSgm30.h" />
     <ClInclude Include="CDConfigManager.h" />
     <ClInclude Include="Cvirtualccd.h" />
+    <ClInclude Include="DllInterface.h" />
     <ClInclude Include="GlobalShare.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
