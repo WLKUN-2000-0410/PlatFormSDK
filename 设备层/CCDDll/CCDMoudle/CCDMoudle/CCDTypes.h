@@ -22,18 +22,19 @@ enum  CCDType {
 struct CCDConfig 
 {
 	CCDType type;
-	std::string deviceName;
-	std::string port;
-	int baudRate;
+	std::vector<std::string>  Dependentfiles;
 	double defaultExposureTime;
-	int pixelNum;
-	std::map<std::string, std::string> parameters;
+	double defaulttemperature;
+	int    defaultgain;
 
-	// 默认构造函数
-	CCDConfig() : type(CCDType::VIRTUAL), baudRate(9600), defaultExposureTime(100.0), pixelNum(1024) {}
-
-	// 带类型的构造函数
-	CCDConfig(CCDType t) : type(t), baudRate(9600), defaultExposureTime(100.0), pixelNum(1024) {}
+	CCDConfig()
+	{
+		type = CCDType::VIRTUAL;
+		Dependentfiles.swap(std::vector<std::string>());
+		defaultExposureTime = 100.0;
+		defaulttemperature = 20.5;
+		defaultgain = 1;
+	}
 };
 
 // CCD操作结果

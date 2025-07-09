@@ -24,7 +24,7 @@ namespace {
 	{
 		std::vector<std::string> configPaths = 
 		{
-			"./Ccd_config.ini",
+			"./Ccd_config.json",
 			//"./config/config.ini",
 			//"C:/CCDModule/config.ini"
 		};
@@ -46,28 +46,28 @@ namespace {
 
 		// 设置全局默认参数
 		configMgr.SetGlobalParameter("DefaultCCDType", "SGM30");
-		configMgr.SetGlobalParameter("LogLevel", "INFO");
-		configMgr.SetGlobalParameter("TimeoutMs", "5000");
 
 		// 设置各设备默认配置
-		CCDConfig sgm30Config(CCDType::SGM30);
-		sgm30Config.deviceName = "SGM30_Device";
-		sgm30Config.port = "COM3";
-		sgm30Config.baudRate = 115200;
+		CCDConfig  sgm30Config;
+		sgm30Config.type = CCDType::SGM30;
+		sgm30Config.Dependentfiles.push_back("UserApplication.dll");
+		sgm30Config.Dependentfiles.push_back("SiUSBXp.dll");
+		sgm30Config.Dependentfiles.push_back("DeviceLibrary.dll");
 		sgm30Config.defaultExposureTime = 100.0;
-		sgm30Config.pixelNum = 2048;
+		sgm30Config.defaulttemperature = 20.5;
+		sgm30Config.defaultgain = 1;
 		configMgr.SetDeviceConfig(CCDType::SGM30, sgm30Config);
 
-		CCDConfig c2Config(CCDType::C2);
-		c2Config.deviceName = "C2_Device";
-		c2Config.port = "COM4";
-		c2Config.baudRate = 9600;
-		c2Config.defaultExposureTime = 50.0;
-		c2Config.pixelNum = 1024;
-		configMgr.SetDeviceConfig(CCDType::C2, c2Config);
+		//CCDConfig c2Config(CCDType::C2);
+		//c2Config.deviceName = "C2_Device";
+		//c2Config.port = "COM4";
+		//c2Config.baudRate = 9600;
+		//c2Config.defaultExposureTime = 50.0;
+		//c2Config.pixelNum = 1024;
+		//configMgr.SetDeviceConfig(CCDType::C2, c2Config);
 
 		// 保存默认配置
-		return configMgr.SaveConfig("./Ccd_config.ini");
+		return configMgr.SaveConfig("./Ccd_config.json");
 	}
 }
 API_CCD_Moudle_H bool InitDll()

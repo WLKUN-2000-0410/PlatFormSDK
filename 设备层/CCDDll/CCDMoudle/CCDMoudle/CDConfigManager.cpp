@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 
+using json = nlohmann::json;
+
 CCDConfigManager::CCDConfigManager()
 {
 	initLog();
@@ -80,22 +82,91 @@ std::shared_ptr<spdlog::logger> CCDConfigManager::getLogHandle()
 
 bool CCDConfigManager::ParseConfigFile(const std::string & content)
 {
-	// 简单的配置解析示例（实际项目中建议使用JSON或XML库）
-	std::istringstream iss(content);
-	std::string line;
-
-	while (std::getline(iss, line)) {
-		if (line.empty() || line[0] == '#') continue;
-
-		size_t pos = line.find('=');
-		if (pos != std::string::npos) {
-			std::string key = line.substr(0, pos);
-			std::string value = line.substr(pos + 1);
-			SetGlobalParameter(key, value);
+	try {
+		json j = json::parse(content);
+		// 解析全局参数
+		if (j.find("Global") != j.end() && j["Global"].is_object()) {
+			for (json::iterator it = j["Global"].begin(); it != j["Global"].end(); ++it) {
+				std::string key = it.key();
+				json value = it.value();
+				m_globalParams[key] = value.is_string() ? value.get<std::string>() : value.dump();
+			}
 		}
-	}
+		else
+		{
+			LogPrintErr("json file : 'Global' was not found");
+			return false;
+		}
+		// 解析设备配置
+		if (j.find("Devices") != j.end() && j["Devices"].is_object()) 
+		{
+			for (json::iterator it = j["Devices"].begin(); it != j["Devices"].end(); ++it) 
+			{
+				std::string typeStr = it.key();
+				json config = it.value();
+				CCDType type = StringToCCDType(typeStr);
+				CCDConfig cfg;
+				cfg.type = type;
+				if (config.find("Dependentfiles") != config.end() && config["Dependentfiles"].is_array()) 
+				{
+					cfg.Dependentfiles.clear();
+					for (json::const_iterator file_it = config["Dependentfiles"].begin();
+						file_it != config["Dependentfiles"].end(); ++file_it) {
+						cfg.Dependentfiles.push_back(file_it->get<std::string>());
+					}
+				}
+				else
+				{
+					LogPrintErr("json {0} file : 'Dependentfiles' was not found", typeStr);
+					return false;
+				}
+				// 解析 DefaultExposureTime
+				if (config.find("DefaultExposureTime") != config.end() && config["DefaultExposureTime"].is_number()) 
+				{
+					cfg.defaultExposureTime = config["DefaultExposureTime"].get<double>();
+				}
+				else 
+				{
+					LogPrintErr("json {0} file : 'DefaultExposureTime' was not found", typeStr);
+					return false;
+				}
 
-	return true;
+				// 解析 Defaulttemperature
+				if (config.find("Defaulttemperature") != config.end() && config["Defaulttemperature"].is_number()) 
+				{
+					cfg.defaulttemperature = config["Defaulttemperature"].get<double>();
+				}
+				else 
+				{
+					LogPrintErr("json {0} file : 'Defaulttemperature' was not found", typeStr);
+					return false;
+				}
+
+				// 解析 Defaultgain
+				if (config.find("Defaultgain") != config.end() && config["Defaultgain"].is_number_integer()) 
+				{
+					cfg.defaultgain = config["Defaultgain"].get<int>();
+				}
+				else 
+				{
+					LogPrintErr("json {0} file : 'Defaultgain' was not found", typeStr);
+					return false;
+				}
+				m_deviceConfigs[type] = cfg;
+			}
+		}
+		else
+		{
+			LogPrintErr("json file : 'Devices' was not found");
+			return false;
+		}
+		return true;
+	}
+	catch (const json::exception& e) 
+	{
+		LogPrintErr("Failed to read the json file!");
+		return false;
+	}
 }
 
 std::string CCDConfigManager::GenerateConfigContent() const

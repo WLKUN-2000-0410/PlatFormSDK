@@ -5,6 +5,7 @@
 #include <map>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <json.hpp>
 
 #define LogPrintInfo CCDConfigManager::GetInstance().getLogHandle()->info
 #define LogPrintErr  CCDConfigManager::GetInstance().getLogHandle()->error
