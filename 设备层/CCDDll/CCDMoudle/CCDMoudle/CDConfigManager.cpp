@@ -5,17 +5,12 @@
 
 CCDConfigManager::CCDConfigManager()
 {
+	initLog();
 }
 
 
 CCDConfigManager::~CCDConfigManager()
 {
-}
-
-CCDConfigManager & CCDConfigManager::GetInstance()
-{
-	static CCDConfigManager instance;
-	return instance;
 }
 
 bool CCDConfigManager::LoadConfig(const std::string & filePath)
@@ -66,6 +61,20 @@ std::string CCDConfigManager::GetGlobalParameter(const std::string & key) const
 void CCDConfigManager::SetGlobalParameter(const std::string & key, const std::string & value)
 {
 	m_globalParams[key] = value;
+}
+
+void CCDConfigManager::initLog()
+{
+	logger = spdlog::basic_logger_mt("realtime_logger", "log.txt");
+	logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%L%$] [thread %t] %v"); // 设置日志格式
+	logger->flush_on(spdlog::level::info); // 设置在info级别以上的日志才会刷新到文件
+	spdlog::set_default_logger(logger); // 设置默认日志对象
+
+}
+
+std::shared_ptr<spdlog::logger> CCDConfigManager::getLogHandle()
+{
+	return logger;
 }
 
 bool CCDConfigManager::ParseConfigFile(const std::string & content)

@@ -3,14 +3,25 @@
 #include "CCDTypes.h"
 #include <string>
 #include <map>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
+#define LogPrintInfo CCDConfigManager::GetInstance().getLogHandle()->info
+#define LogPrintErr  CCDConfigManager::GetInstance().getLogHandle()->error
+
 
 class CCDConfigManager
 {
 private:
 	CCDConfigManager();
+public:
 	~CCDConfigManager();
 public:
-	static CCDConfigManager& GetInstance();
+	static CCDConfigManager& GetInstance()
+	{
+		static CCDConfigManager instance;
+		return instance;
+	}
 
 	// 从文件加载配置
 	bool LoadConfig(const std::string& filePath);
@@ -29,8 +40,10 @@ public:
 
 	// 设置全局配置参数
 	void SetGlobalParameter(const std::string& key, const std::string& value);
-
-
+	//
+	void initLog();
+	//
+	std::shared_ptr<spdlog::logger>  getLogHandle();
 private:
 	std::map<CCDType, CCDConfig> m_deviceConfigs;
 	std::map<std::string, std::string> m_globalParams;
@@ -40,5 +53,7 @@ private:
 
 	// 生成配置文件内容
 	std::string GenerateConfigContent() const;
+	//
+	std::shared_ptr<spdlog::logger> logger;
 };
 

@@ -27,41 +27,22 @@ namespace {
 	// 记录错误信息
 	void SetLastError(const std::string& error) 
 	{
-		std::lock_guard<std::mutex> lock(g_mutex);
 		g_lastError = error;
-
-		// 写入日志文件
-		std::ofstream logFile("CCDModule.log", std::ios::app);
-		if (logFile.is_open()) 
-		{
-			auto now = std::time(nullptr);
-			std::tm tm;
-			localtime_s(&tm, &now); // 使用 localtime_s
-			logFile << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
-				<< "] ERROR: " << error << std::endl;
-			logFile.close();
-		}
+		LogPrintErr("{0}", error);
 	}
 
 	// 记录信息日志
 	void LogInfo(const std::string& info) 
 	{
-		std::ofstream logFile("CCDModule.log", std::ios::app);
-		if (logFile.is_open()) 
-		{
-			auto now = std::time(nullptr);
-			std::tm tm;
-			localtime_s(&tm, &now); // 使用 localtime_s
-			logFile << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
-				<< "] INFO: " << info << std::endl;
-			logFile.close();
-		}
+		LogPrintInfo("{0}", info);
 	}
 
 	// 检查配置文件并创建默认配置
-	bool EnsureConfigFile() {
-		std::vector<std::string> configPaths = {
-			"./config.ini",
+	bool EnsureConfigFile() 
+	{
+		std::vector<std::string> configPaths = 
+		{
+			"./Ccd_config.ini",
 			//"./config/config.ini",
 			//"C:/CCDModule/config.ini"
 		};
@@ -69,8 +50,10 @@ namespace {
 		auto& configMgr = CCDConfigManager::GetInstance();
 
 		// 尝试加载现有配置文件
-		for (const auto& path : configPaths) {
-			if (configMgr.LoadConfig(path)) {
+		for (const auto& path : configPaths) 
+		{
+			if (configMgr.LoadConfig(path)) 
+			{
 				LogInfo("Config loaded from: " + path);
 				return true;
 			}
@@ -102,7 +85,7 @@ namespace {
 		configMgr.SetDeviceConfig(CCDType::C2, c2Config);
 
 		// 保存默认配置
-		return configMgr.SaveConfig("./config.ini");
+		return configMgr.SaveConfig("./Ccd_config.ini");
 	}
 }
 API_CCD_Moudle_H bool InitDll()
