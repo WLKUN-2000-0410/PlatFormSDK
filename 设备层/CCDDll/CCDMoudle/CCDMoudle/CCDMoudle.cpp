@@ -545,100 +545,83 @@ API_CCD_Moudle_H bool GetCurrentTemperature(double * temp)
 	}
 }
 
-API_CCD_Moudle_H bool DataAcqOneShot(double * pd, int nPixSize)
+API_CCD_Moudle_H bool DataAcqOneShot(unsigned short *pd, unsigned long  nPixSize)
 {
-	return false;
-	//std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
+	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
-	//try {
-	//	if (!GlobalShare::g_initialized) {
-	//		LogPrintErr("DLL not initialized");
-	//		return false;
-	//	}
+	try {
+		if (!pd) {
+			LogPrintErr("Invalid parameter: pd is null");
+			return false;
+		}
 
-	//	if (!GlobalShare::g_currentDevice) {
-	//		LogPrintErr("No CCD device available");
-	//		return false;
-	//	}
-	//	if (!GlobalShare::g_currentDevice->IsConnected()) {
-	//		LogPrintErr("Device not connected");
-	//		return false;
-	//	}
+		if (nPixSize <= 0) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_PARAM, "Invalid pixel size");
+			LogPrintErr("Invalid pixel size: {0}", nPixSize);
+			return false;
+		}
 
-	//	if (gain <= 0) {
-	//		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_GAIN, "Invalid gain setting");
-	//		LogPrintErr("Invalid gain: {0}", gain);
-	//		return false;
-	//	}
-	//	LogPrintInfo("Setting gain to: {0}", gain);
-	//	bool result = GlobalShare::g_currentDevice->SetGain(gain);
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
 
-	//	if (result) {
-	//		LogPrintInfo("Successfully set gain");
-	//	}
-	//	else {
-	//		LogPrintErr("Failed to set gain");
-	//	}
+		if (!GlobalShare::g_currentDevice) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_DEVICE_NOT_FOUND, "No CCD device available");
+			LogPrintErr("No CCD device available");
+			return false;
+		}
 
-	//	return result;
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_DEVICE_NOT_CONNECTED, "Device not connected");
+			LogPrintErr("Device not connected");
+			return false;
+		}
 
-	//}
-	//catch (const std::exception& e) {
-	//	LogPrintErr("Exception in SetGain: {0}", std::string(e.what()));
-	//	return false;
-	//}
-	//catch (...) {
-	//	LogPrintErr("Unknown exception in GetPixelNum");
-	//	return false;
-	//}
+		int devicePixelNum = 0;
+		if (!GlobalShare::g_currentDevice->GetPixelNum(&devicePixelNum)) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_DEVICE_BUSY, "Failed to get device pixel number");
+			LogPrintErr("Failed to get device pixel number");
+			return false;
+		}
+
+		if (nPixSize < devicePixelNum) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_BUFFER_TOO_SMALL, "Buffer too small for pixel data");
+			LogPrintErr("Buffer too small: provided {0}, required {1}", nPixSize, devicePixelNum);
+			return false;
+		}
+
+		LogPrintInfo("Starting single-shot data acquisition, pixel count: {0}", devicePixelNum);
+
+		// 执行单次数据采集
+		bool result = GlobalShare::g_currentDevice->DataAcqOneShot(pd, nPixSize);
+
+		if (result) {
+			LogPrintInfo("Successfully completed single-shot data acquisition");
+		}
+		else {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_ACQUISITION_FAILED, "Data acquisition failed");
+			LogPrintErr("Failed to acquire data");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in DataAcqOneShot: {0}", std::string(e.what()));
+		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_UNKNOWN, "Exception occurred during data acquisition");
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in DataAcqOneShot");
+		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_UNKNOWN, "Unknown exception occurred");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool DataAcqOneShotImg(double * pdImg, int * nPixSize)
 {
 	return false;
-	//std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-
-	//try {
-	//	if (!GlobalShare::g_initialized) {
-	//		LogPrintErr("DLL not initialized");
-	//		return false;
-	//	}
-
-	//	if (!GlobalShare::g_currentDevice) {
-	//		LogPrintErr("No CCD device available");
-	//		return false;
-	//	}
-	//	if (!GlobalShare::g_currentDevice->IsConnected()) {
-	//		LogPrintErr("Device not connected");
-	//		return false;
-	//	}
-
-	//	if (gain <= 0) {
-	//		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_GAIN, "Invalid gain setting");
-	//		LogPrintErr("Invalid gain: {0}", gain);
-	//		return false;
-	//	}
-	//	LogPrintInfo("Setting gain to: {0}", gain);
-	//	bool result = GlobalShare::g_currentDevice->SetGain(gain);
-
-	//	if (result) {
-	//		LogPrintInfo("Successfully set gain");
-	//	}
-	//	else {
-	//		LogPrintErr("Failed to set gain");
-	//	}
-
-	//	return result;
-
-	//}
-	//catch (const std::exception& e) {
-	//	LogPrintErr("Exception in SetGain: {0}", std::string(e.what()));
-	//	return false;
-	//}
-	//catch (...) {
-	//	LogPrintErr("Unknown exception in GetPixelNum");
-	//	return false;
-	//}
 }
 
 API_CCD_Moudle_H bool GetSDKVersion(char * version)

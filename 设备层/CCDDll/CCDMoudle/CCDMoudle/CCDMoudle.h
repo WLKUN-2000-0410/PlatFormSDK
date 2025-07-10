@@ -34,7 +34,7 @@ extern "C"
 	API_CCD_Moudle_H	bool			EnableCooling(bool enable);
 	API_CCD_Moudle_H	bool			SetCoolingTemperature(double temp);
 	API_CCD_Moudle_H	bool			GetCurrentTemperature(double* temp);
-	API_CCD_Moudle_H	bool			DataAcqOneShot(double *pd, int  nPixSize);
+	API_CCD_Moudle_H	bool			DataAcqOneShot(unsigned short *pd, unsigned long  nPixSize);
 	API_CCD_Moudle_H	bool			DataAcqOneShotImg(double *pdImg, int *nPixSize);
 	API_CCD_Moudle_H	bool			GetSDKVersion(char* version); //Specify a 32-byte buffer
 	API_CCD_Moudle_H	const char*     GetErrorMessage(SDKErrorCode errorCode);

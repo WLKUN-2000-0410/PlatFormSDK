@@ -45,3 +45,8 @@ bool CCDTypeC2::GetPixelNum(int * size)
 {
 	return false;
 }
+
+bool CCDTypeC2::DataAcqOneShot(unsigned short * buff, unsigned long size)
+{
+	return false;
+}

@@ -13,6 +13,7 @@ public:
 	bool   SetExposureTime(double timeMs) override;
 	bool   GetExposureTime(double* timeMs) override;
 	bool   GetPixelNum(int* size) override;
+	bool   DataAcqOneShot(unsigned short * buff, unsigned long size) override;
 
 	bool   SetGain(int gain) override;
 	bool   GetGain(int *gain) override;

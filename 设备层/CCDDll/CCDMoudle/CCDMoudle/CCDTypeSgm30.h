@@ -18,7 +18,7 @@ public:
 	bool   SetExposureTime(double timeMs);
 	bool   GetExposureTime(double* timeMs);
 	bool   GetPixelNum(int* size);
-
+	bool   DataAcqOneShot(unsigned short * buff, unsigned long size) override;
 
 private:
 	bool   initDll();

@@ -15,6 +15,8 @@ public:
 	virtual bool   SetExposureTime(double timeMs) = 0;
 	virtual bool   GetExposureTime(double* timeMs) = 0;
 	virtual bool   GetPixelNum(int* size) = 0;
+	virtual bool   DataAcqOneShot(unsigned short * buff, unsigned long size) = 0;
+
 
 	virtual bool   SetCoolingTemperature(double temp) { return false; };
 	virtual bool   GetCurrentTemperature(double* temp) { return false;};

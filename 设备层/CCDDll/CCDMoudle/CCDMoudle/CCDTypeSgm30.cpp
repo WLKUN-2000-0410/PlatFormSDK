@@ -199,38 +199,38 @@ void CCDTypeSgm30::loadDllFun()
 	UAI_SpectrometerSetTriggerGroupIntegrationTime  = (DLL_OutER_inVp1_inUI2_inUIp3)GetProcAddress(Handle, "UAI_SpectrometerSetTriggerGroupIntegrationTime");
 }
 
-//bool CCDTypeSgm30::GetAcquiredData(unsigned short * buff, unsigned long size)
-//{
-//	if (!_opened) return false;
-//
-//	if (!buff || size == 0 || !_handle)
-//	{
-//		return false;
-//	}
-//
-//	std::vector<float> vbuffer(size, 0.0);
-//	int ret = UAI_SpectrometerDataOneshotRaw(_handle, _exposure, vbuffer.data(), /*_average*/1);
-//	if (ret == 0x80000005)
-//	{
-//		return false;
-//	}
-//	for (size_t i = 0; i < size; i++)
-//	{
-//		float value = vbuffer[i];
-//
-//		// 安全转换
-//		if (value < 0.0f)
-//		{
-//			buff[i] = 0;
-//		}
-//		else if (value > 65535.0f)
-//		{
-//			buff[i] = 65535;
-//		}
-//		else
-//		{
-//			buff[i] = static_cast<unsigned short>(std::round(value));
-//		}
-//	}
-//	return true;
-//}
+bool CCDTypeSgm30::DataAcqOneShot(unsigned short * buff, unsigned long size)
+{
+	if (!m_isConnected) return false;
+
+	if (!buff || size == 0 || !_handle)
+	{
+		return false;
+	}
+
+	std::vector<float> vbuffer(size, 0.0);
+	int ret = UAI_SpectrometerDataOneshotRaw(_handle, _exposure, vbuffer.data(), /*_average*/1);
+	if (ret == 0x80000005)
+	{
+		return false;
+	}
+	for (size_t i = 0; i < size; i++)
+	{
+		float value = vbuffer[i];
+
+		// 安全转换
+		if (value < 0.0f)
+		{
+			buff[i] = 0;
+		}
+		else if (value > 65535.0f)
+		{
+			buff[i] = 65535;
+		}
+		else
+		{
+			buff[i] = static_cast<unsigned short>(std::round(value));
+		}
+	}
+	return true;
+}

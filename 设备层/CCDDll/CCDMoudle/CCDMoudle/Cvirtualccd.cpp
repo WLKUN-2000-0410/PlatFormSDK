@@ -141,3 +141,85 @@ bool Cvirtualccd::GetPixelNum(int* size) {
 	*size = m_pixelNum;
 	return true;
 }
+
+bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
+{
+	if (!buff) {
+		return false;
+	}
+
+	if (size == 0) {
+		return false;
+	}
+	if (!IsConnected()) {
+		return false;
+	}
+
+	try {
+		if (m_exposureTime > 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(m_exposureTime)));
+		}
+
+		// 生成sin(x)前1/2周期的模拟数据
+		const double PI = 3.14159265358979323846;
+		const double halfPeriod = PI;  // π 对应sin(x)的前1/2周期
+
+										// 基础参数
+		const unsigned short baseValue = 1000;     // 基础偏移值
+		const unsigned short amplitude = 30000;    // 振幅（适合16位数据范围）
+		const unsigned short noiseLevel = 100;    // 噪声水平
+
+													// 增益影响振幅
+		double gainFactor = static_cast<double>(m_gain) / 100.0;  // 假设增益基准为100
+		unsigned short actualAmplitude = static_cast<unsigned short>(amplitude * gainFactor);
+
+		// 生成数据
+		for (unsigned long i = 0; i < size; ++i) {
+			// 计算当前像素对应的角度（0到π）
+			double angle = (static_cast<double>(i) / static_cast<double>(size - 1)) * halfPeriod;
+
+			// 计算sin值
+			double sinValue = std::sin(angle);
+
+			// 生成随机噪声
+			int noise = (rand() % (2 * noiseLevel + 1)) - noiseLevel;  // -noiseLevel 到 +noiseLevel
+
+																		// 计算最终像素值
+			double pixelValue = baseValue + actualAmplitude * sinValue + noise;
+
+			// 限制在16位范围内
+			if (pixelValue < 0) {
+				pixelValue = 0;
+			}
+			else if (pixelValue > 65535) {
+				pixelValue = 65535;
+			}
+
+			buff[i] = static_cast<unsigned short>(pixelValue);
+		}
+
+		if (m_coolingEnabled) 
+		{
+			double tempFactor = 1.0 - (25.0 - m_temperature) / 25.0 * 0.1;  
+
+			for (unsigned long i = 0; i < size; ++i) {
+				double adjustedValue = buff[i] * tempFactor;
+				if (adjustedValue < 0) adjustedValue = 0;
+				if (adjustedValue > 65535) adjustedValue = 65535;
+				buff[i] = static_cast<unsigned short>(adjustedValue);
+			}
+		}
+		LogPrintInfo("Virtual CCD: Generated {0} pixels of sin(x) half-period data", size);
+		return true;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in Virtual CCD DataAcqOneShot: {0}", std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in Virtual CCD DataAcqOneShot");
+		return false;
+	}
+}
+
