@@ -96,6 +96,7 @@ API_CCD_Moudle_H bool Connect()
 		}
 
 		if (!GlobalShare::g_currentDevice) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_DEVICE_NOT_FOUND, "No CCD device available");
 			LogPrintErr("No CCD device available");
 			return false;
 		}
@@ -112,6 +113,7 @@ API_CCD_Moudle_H bool Connect()
 			LogPrintInfo("Successfully connected to CCD device");
 		}
 		else {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_DEVICE_NOT_CONNECTED, "Failed to connect to CCD device");
 			LogPrintErr("Failed to connect to CCD device");
 		}
 
@@ -201,6 +203,7 @@ API_CCD_Moudle_H bool SetExposureTime(double timeMs)
 		}
 
 		if (timeMs <= 0) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_EXPOSURE_TIME,"Invalid exposure time setting");
 			LogPrintErr("Invalid exposure time: " + std::to_string(timeMs));
 			return false;
 		}
@@ -406,6 +409,58 @@ API_CCD_Moudle_H bool SDKCleanup()
 		LogPrintErr("Unknown exception in UnInitDll");
 		return false;
 	}
+}
+
+API_CCD_Moudle_H const char* GetErrorMessage(SDKErrorCode errorCode) {
+	switch (errorCode) {
+	case SDK_SUCCESS:
+		return "Operation successful";
+	case SDK_ERROR_INVALID_PARAM:
+		return "Invalid parameter";
+	case SDK_ERROR_MEMORY_ALLOC:
+		return "Memory allocation failed";
+	case SDK_ERROR_NETWORK:
+		return "Network error";
+	case SDK_ERROR_TIMEOUT:
+		return "Operation timed out";
+	case SDK_ERROR_DEVICE_NOT_FOUND:
+		return "CCD device not found";
+	case SDK_ERROR_DEVICE_NOT_CONNECTED:
+		return "Device not connected";
+	case SDK_ERROR_DEVICE_BUSY:
+		return "Device is busy, please try again later";
+	case SDK_ERROR_COOLING_FAILED:
+		return "Cooling system failure";
+	case SDK_ERROR_ACQUISITION_FAILED:
+		return "Data acquisition failed";
+	case SDK_ERROR_INVALID_TEMPERATURE:
+		return "Temperature setting out of range";
+	case SDK_ERROR_INVALID_GAIN:
+		return "Gain value out of range";
+	case SDK_ERROR_INVALID_EXPOSURE_TIME:
+		return "Invalid exposure time setting";
+	case SDK_ERROR_BUFFER_TOO_SMALL:
+		return "Buffer too small";
+	case SDK_ERROR_UNKNOWN:
+	default:
+		return "Unknown error";
+	}
+}
+
+API_CCD_Moudle_H SDKErrorCode GetSdkLastError()
+{
+	return GlobalShare::g_s_lastError;
+}
+
+API_CCD_Moudle_H const char * GetLastErrorMessage()
+{
+	return GlobalShare::g_s_lastErrorMessage;
+}
+
+API_CCD_Moudle_H void ClearError()
+{
+	GlobalShare::g_s_lastError = SDK_SUCCESS;
+	GlobalShare::g_s_lastErrorMessage[0] = '\0';
 }
 
 

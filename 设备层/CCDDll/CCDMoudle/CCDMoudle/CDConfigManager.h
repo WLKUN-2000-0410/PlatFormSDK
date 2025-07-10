@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <json.hpp>
+#include "CCDMoudle.h"
 
 #define LogPrintInfo CCDConfigManager::GetInstance().getLogHandle()->info
 #define LogPrintErr  CCDConfigManager::GetInstance().getLogHandle()->error
@@ -47,6 +48,8 @@ public:
 	std::shared_ptr<spdlog::logger>  getLogHandle();
 	// 检查配置文件并创建默认配置
 	bool EnsureConfigFile();
+	//
+	void SetLastError(SDKErrorCode code, const char* format, ...);
 private:
 	std::map<CCDType, CCDConfig> m_deviceConfigs;
 	std::map<std::string, std::string> m_globalParams;

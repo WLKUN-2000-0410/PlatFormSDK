@@ -1,6 +1,7 @@
 
 #include "CDConfigManager.h"
 #include <fstream>
+#include "GlobalShare.h"
 #include <sstream>
 
 using json = nlohmann::json;
@@ -251,4 +252,24 @@ std::string CCDConfigManager::GenerateConfigContent() const
 		j["Devices"][CCDTypeToString(it->first)] = cfg;
 	}
 	return j.dump(2); // 格式化输出，缩进2空格
+}
+
+void CCDConfigManager::SetLastError(SDKErrorCode code, const char* format, ...) 
+{
+	GlobalShare::g_s_lastError = code;
+
+	char errorMessage[512] = { 0 };
+	if (format) {
+		va_list args;
+		va_start(args, format);
+		vsnprintf(errorMessage, sizeof(errorMessage), format, args);
+		va_end(args);
+		strcpy_s(GlobalShare::g_s_lastErrorMessage, errorMessage);
+	}
+	else {
+		strcpy_s(GlobalShare::g_s_lastErrorMessage, GetErrorMessage(code));
+		strcpy_s(errorMessage, GlobalShare::g_s_lastErrorMessage);
+	}
+
+//	LogPrintErr("[SDK_ERROR] Code: {0}, Message: {1}", code, errorMessage);
 }
