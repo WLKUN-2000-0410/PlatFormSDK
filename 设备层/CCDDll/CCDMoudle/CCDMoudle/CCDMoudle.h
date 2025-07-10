@@ -17,5 +17,6 @@ extern "C"
 	API_CCD_Moudle_H  bool    GetCurrentTemperature(double* temp);
 	API_CCD_Moudle_H  bool    DataAcqOneShot(double *pd, int  nPixSize);
 	API_CCD_Moudle_H  bool    DataAcqOneShotImg(double *pdImg, int *nPixSize);
+	API_CCD_Moudle_H  bool    GetSDKVersion(char* version);
 	API_CCD_Moudle_H  bool    UnInitDll();
 }

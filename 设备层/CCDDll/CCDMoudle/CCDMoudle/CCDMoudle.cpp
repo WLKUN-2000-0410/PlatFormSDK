@@ -16,6 +16,7 @@
 #include <iomanip>  
 #include "GlobalShare.h"
 
+#define MODULE_VERSION "1.0.0" // 
 
 API_CCD_Moudle_H bool InitDll()
 {
@@ -354,6 +355,18 @@ API_CCD_Moudle_H bool DataAcqOneShotImg(double * pdImg, int * nPixSize)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	return false;
+}
+
+API_CCD_Moudle_H bool GetSDKVersion(char * version)
+{
+	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
+	if (!version) {
+		LogPrintErr("Null pointer for version");
+		return false;
+	}
+	strncpy_s(version, strlen(MODULE_VERSION) + 1, MODULE_VERSION, strlen(MODULE_VERSION));
+	LogPrintInfo("Retrieved SDK version: " + std::string(MODULE_VERSION));
+	return true;
 }
 
 API_CCD_Moudle_H bool UnInitDll()

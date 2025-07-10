@@ -35,14 +35,12 @@ CCDTypeSgm30::~CCDTypeSgm30()
 
 bool CCDTypeSgm30::Initialize(const CCDConfig & config)
 {
-	// 检查并加载依赖文件
 	for (std::vector<std::string>::const_iterator it = config.Dependentfiles.begin();
 		it != config.Dependentfiles.end(); ++it)
 	{
 		if (it->empty()) {
-			continue; // 跳过空文件名
+			continue; 
 		}
-		// 检查文件是否存在
 		std::ifstream file(*it);
 		if (!file.good()) {
 			LogPrintErr("Dependency file not found: {0}", *it);
