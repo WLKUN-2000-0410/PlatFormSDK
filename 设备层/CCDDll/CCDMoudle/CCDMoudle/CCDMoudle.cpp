@@ -18,7 +18,7 @@
 
 #define MODULE_VERSION "1.0.0" // 
 
-API_CCD_Moudle_H bool InitDll()
+API_CCD_Moudle_H bool SDKInit()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	try 
@@ -369,7 +369,7 @@ API_CCD_Moudle_H bool GetSDKVersion(char * version)
 	return true;
 }
 
-API_CCD_Moudle_H bool UnInitDll()
+API_CCD_Moudle_H bool SDKCleanup()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 

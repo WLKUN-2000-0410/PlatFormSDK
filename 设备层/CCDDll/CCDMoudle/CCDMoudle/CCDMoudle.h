@@ -3,7 +3,7 @@
 
 extern "C"
 {
-	API_CCD_Moudle_H  bool    InitDll();
+	API_CCD_Moudle_H  bool    SDKInit();
 	API_CCD_Moudle_H  bool    Connect();
 	API_CCD_Moudle_H  bool    IsConnected();
 	API_CCD_Moudle_H  bool    DisConnect();
@@ -17,6 +17,6 @@ extern "C"
 	API_CCD_Moudle_H  bool    GetCurrentTemperature(double* temp);
 	API_CCD_Moudle_H  bool    DataAcqOneShot(double *pd, int  nPixSize);
 	API_CCD_Moudle_H  bool    DataAcqOneShotImg(double *pdImg, int *nPixSize);
-	API_CCD_Moudle_H  bool    GetSDKVersion(char* version);
-	API_CCD_Moudle_H  bool    UnInitDll();
+	API_CCD_Moudle_H  bool    GetSDKVersion(char* version); //Specify a 32-byte buffer
+	API_CCD_Moudle_H  bool    SDKCleanup();
 }
