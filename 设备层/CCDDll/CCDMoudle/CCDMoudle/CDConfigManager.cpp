@@ -267,7 +267,7 @@ void CCDConfigManager::SetLastError(SDKErrorCode code, const char* format, ...)
 		strcpy_s(GlobalShare::g_s_lastErrorMessage, errorMessage);
 	}
 	else {
-		strcpy_s(GlobalShare::g_s_lastErrorMessage, GetErrorMessage(code));
+		strcpy_s(GlobalShare::g_s_lastErrorMessage, ZLX_GetErrorMessage(code));
 		strcpy_s(errorMessage, GlobalShare::g_s_lastErrorMessage);
 	}
 

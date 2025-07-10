@@ -18,7 +18,7 @@
 
 #define MODULE_VERSION "1.0.0" // 
 
-API_CCD_Moudle_H bool SDKInit()
+API_CCD_Moudle_H bool ZLX_SDKInit()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	try 
@@ -85,7 +85,7 @@ API_CCD_Moudle_H bool SDKInit()
 	}
 }
 
-API_CCD_Moudle_H bool Connect()
+API_CCD_Moudle_H bool ZLX_Connect()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -129,7 +129,7 @@ API_CCD_Moudle_H bool Connect()
 		return false;
 	}
 }
-API_CCD_Moudle_H bool IsConnected()
+API_CCD_Moudle_H bool ZLX_IsConnected()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -139,7 +139,7 @@ API_CCD_Moudle_H bool IsConnected()
 	}
 	return GlobalShare::g_currentDevice->IsConnected();
 }
-API_CCD_Moudle_H bool DisConnect()
+API_CCD_Moudle_H bool ZLX_DisConnect()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -182,7 +182,7 @@ API_CCD_Moudle_H bool DisConnect()
 		return false;
 	}
 }
-API_CCD_Moudle_H bool SetExposureTime(double timeMs)
+API_CCD_Moudle_H bool ZLX_SetExposureTime(double timeMs)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -230,7 +230,7 @@ API_CCD_Moudle_H bool SetExposureTime(double timeMs)
 		return false;
 	}
 }
-API_CCD_Moudle_H bool GetExposureTime(double* timeMs)
+API_CCD_Moudle_H bool ZLX_GetExposureTime(double* timeMs)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -276,7 +276,7 @@ API_CCD_Moudle_H bool GetExposureTime(double* timeMs)
 		return false;
 	}
 }
-API_CCD_Moudle_H bool GetPixelNum(int* size)
+API_CCD_Moudle_H bool ZLX_GetPixelNum(int* size)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -318,7 +318,7 @@ API_CCD_Moudle_H bool GetPixelNum(int* size)
 	}
 }
 
-API_CCD_Moudle_H bool SetGain(int gain)
+API_CCD_Moudle_H bool ZLX_SetGain(int gain)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -365,7 +365,7 @@ API_CCD_Moudle_H bool SetGain(int gain)
 	}
 }
 
-API_CCD_Moudle_H bool GetGain(int * gain)
+API_CCD_Moudle_H bool ZLX_GetGain(int * gain)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -412,7 +412,7 @@ API_CCD_Moudle_H bool GetGain(int * gain)
 	}
 }
 
-API_CCD_Moudle_H bool EnableCooling(bool enable)
+API_CCD_Moudle_H bool ZLX_EnableCooling(bool enable)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -453,7 +453,7 @@ API_CCD_Moudle_H bool EnableCooling(bool enable)
 	}
 }
 
-API_CCD_Moudle_H bool SetCoolingTemperature(double temp)
+API_CCD_Moudle_H bool ZLX_SetCoolingTemperature(double temp)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -500,7 +500,7 @@ API_CCD_Moudle_H bool SetCoolingTemperature(double temp)
 	}
 }
 
-API_CCD_Moudle_H bool GetCurrentTemperature(double * temp)
+API_CCD_Moudle_H bool ZLX_GetCurrentTemperature(double * temp)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -545,7 +545,7 @@ API_CCD_Moudle_H bool GetCurrentTemperature(double * temp)
 	}
 }
 
-API_CCD_Moudle_H bool DataAcqOneShot(unsigned short *pd, unsigned long  nPixSize)
+API_CCD_Moudle_H bool ZLX_DataAcqOneShot(unsigned short *pd, unsigned long  nPixSize)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -619,12 +619,12 @@ API_CCD_Moudle_H bool DataAcqOneShot(unsigned short *pd, unsigned long  nPixSize
 	}
 }
 
-API_CCD_Moudle_H bool DataAcqOneShotImg(double * pdImg, int * nPixSize)
+API_CCD_Moudle_H bool ZLX_DataAcqOneShotImg(double * pdImg, int * nPixSize)
 {
 	return false;
 }
 
-API_CCD_Moudle_H bool GetSDKVersion(char * version)
+API_CCD_Moudle_H bool ZLX_GetSDKVersion(char * version)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	if (!version) {
@@ -636,7 +636,7 @@ API_CCD_Moudle_H bool GetSDKVersion(char * version)
 	return true;
 }
 
-API_CCD_Moudle_H bool SDKCleanup()
+API_CCD_Moudle_H bool ZLX_SDKCleanup()
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 
@@ -675,7 +675,7 @@ API_CCD_Moudle_H bool SDKCleanup()
 	}
 }
 
-API_CCD_Moudle_H const char* GetErrorMessage(SDKErrorCode errorCode) {
+API_CCD_Moudle_H const char* ZLX_GetErrorMessage(SDKErrorCode errorCode) {
 	switch (errorCode) {
 	case SDK_SUCCESS:
 		return "Operation successful";
@@ -711,17 +711,17 @@ API_CCD_Moudle_H const char* GetErrorMessage(SDKErrorCode errorCode) {
 	}
 }
 
-API_CCD_Moudle_H SDKErrorCode GetSdkLastError()
+API_CCD_Moudle_H SDKErrorCode ZLX_GetSdkLastError()
 {
 	return GlobalShare::g_s_lastError;
 }
 
-API_CCD_Moudle_H const char * GetLastErrorMessage()
+API_CCD_Moudle_H const char * ZLX_GetLastErrorMessage()
 {
 	return GlobalShare::g_s_lastErrorMessage;
 }
 
-API_CCD_Moudle_H void ClearError()
+API_CCD_Moudle_H void ZLX_ClearError()
 {
 	GlobalShare::g_s_lastError = SDK_SUCCESS;
 	GlobalShare::g_s_lastErrorMessage[0] = '\0';

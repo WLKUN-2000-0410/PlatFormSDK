@@ -151,11 +151,14 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 	if (size == 0) {
 		return false;
 	}
+
+	// 检查设备是否连接
 	if (!IsConnected()) {
 		return false;
 	}
 
 	try {
+		// 模拟数据采集延时（根据曝光时间）
 		if (m_exposureTime > 0) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(m_exposureTime)));
 		}
@@ -164,14 +167,18 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 		const double PI = 3.14159265358979323846;
 		const double halfPeriod = PI;  // π 对应sin(x)的前1/2周期
 
-										// 基础参数
+									   // 基础参数
 		const unsigned short baseValue = 1000;     // 基础偏移值
 		const unsigned short amplitude = 30000;    // 振幅（适合16位数据范围）
 		const unsigned short noiseLevel = 100;    // 噪声水平
 
-													// 增益影响振幅
+												  // 增益影响振幅
 		double gainFactor = static_cast<double>(m_gain) / 100.0;  // 假设增益基准为100
 		unsigned short actualAmplitude = static_cast<unsigned short>(amplitude * gainFactor);
+
+		// 使用时间戳作为随机种子，确保每次采集数据都有变化
+		static unsigned int seedCounter = 0;
+		srand(static_cast<unsigned int>(time(nullptr)) + (++seedCounter));
 
 		// 生成数据
 		for (unsigned long i = 0; i < size; ++i) {
@@ -181,11 +188,19 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 			// 计算sin值
 			double sinValue = std::sin(angle);
 
-			// 生成随机噪声
-			int noise = (rand() % (2 * noiseLevel + 1)) - noiseLevel;  // -noiseLevel 到 +noiseLevel
+			// 生成随机噪声（基础噪声）
+			int baseNoise = (rand() % (2 * noiseLevel + 1)) - noiseLevel;  // -noiseLevel 到 +noiseLevel
 
-																		// 计算最终像素值
-			double pixelValue = baseValue + actualAmplitude * sinValue + noise;
+																		   // 生成随机跳动（在sin值基础上的小幅度波动）
+			double jumpRange = 0.05;  // 跳动范围，相对于振幅的5%
+			double randomJump = ((double)rand() / RAND_MAX - 0.5) * 2.0 * jumpRange;  // -5% 到 +5%
+
+																					  // 添加一些慢变化的漂移（模拟温度漂移等）
+			double driftPhase = (static_cast<double>(seedCounter) / 100.0) + (static_cast<double>(i) / static_cast<double>(size));
+			double drift = sin(driftPhase) * actualAmplitude * 0.02;  // 2%的漂移
+
+																	  // 计算最终像素值
+			double pixelValue = baseValue + actualAmplitude * sinValue * (1.0 + randomJump) + baseNoise + drift;
 
 			// 限制在16位范围内
 			if (pixelValue < 0) {
@@ -198,9 +213,10 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 			buff[i] = static_cast<unsigned short>(pixelValue);
 		}
 
-		if (m_coolingEnabled) 
-		{
-			double tempFactor = 1.0 - (25.0 - m_temperature) / 25.0 * 0.1;  
+		// 模拟温度对数据的影响（如果启用制冷）
+		if (m_coolingEnabled) {
+			// 温度越低，噪声越小，信号质量越好
+			double tempFactor = 1.0 - (25.0 - m_exposureTime) / 25.0 * 0.1;  // 最多10%的改善
 
 			for (unsigned long i = 0; i < size; ++i) {
 				double adjustedValue = buff[i] * tempFactor;
@@ -209,7 +225,9 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 				buff[i] = static_cast<unsigned short>(adjustedValue);
 			}
 		}
-		LogPrintInfo("Virtual CCD: Generated {0} pixels of sin(x) half-period data", size);
+
+		// 记录采集成功
+		LogPrintInfo("Virtual CCD: Generated {0} pixels of dynamic sin(x) half-period data with random variations", size);
 		return true;
 
 	}
@@ -222,4 +240,3 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 		return false;
 	}
 }
-
