@@ -111,14 +111,32 @@ bool CCDTypeSgm30::Connect()
 
 bool CCDTypeSgm30::DisConnect()
 {
-	auto ret = UAI_SpectrometerSetExternalPort(_handle, 0);
-	if (API_SUCCESS != ret) return ret;
+	if (!m_isConnected) {
+		LogPrintInfo("SGM30 already disconnected");
+		return true;
+	}
+	if (!_handle) {
+		LogPrintErr("Invalid device handle");
+		m_isConnected = false;
+		return false;
+	}
+
+	int ret = UAI_SpectrometerSetExternalPort(_handle, 0);
+	if (ret != API_SUCCESS) {
+		LogPrintErr("UAI_SpectrometerSetExternalPort failed with code: {0}" ,ret);
+		m_isConnected = false;
+		return false;
+	}
 
 	ret = UAI_SpectrometerClose(_handle);
-	if (API_SUCCESS != ret) return ret;
-
+	if (ret != API_SUCCESS) {
+		LogPrintErr("UAI_SpectrometerClose failed with code: {0}" ,ret);
+		m_isConnected = false;
+		return false;
+	}
 	m_isConnected = false;
-	return API_SUCCESS;
+	LogPrintInfo("SGM30 disconnected successfully");
+	return true;
 }
 
 bool CCDTypeSgm30::SetExposureTime(double timeMs)
@@ -154,7 +172,7 @@ bool CCDTypeSgm30::initDll()
 	Handle = LoadLibraryA(strdll);
 	if (!Handle)
 	{
-		LogPrintErr("load lib {0} error", strdll);
+		LogPrintErr("load dll {0} error", strdll);
 		return false;
 	}
 	loadDllFun();
@@ -184,3 +202,38 @@ void CCDTypeSgm30::loadDllFun()
 	UAI_SpectrometerSetTriggerGroupIntegrationTime  = (DLL_OutER_inVp1_inUI2_inUIp3)GetProcAddress(Handle, "UAI_SpectrometerSetTriggerGroupIntegrationTime");
 }
 
+//bool CCDTypeSgm30::GetAcquiredData(unsigned short * buff, unsigned long size)
+//{
+//	if (!_opened) return false;
+//
+//	if (!buff || size == 0 || !_handle)
+//	{
+//		return false;
+//	}
+//
+//	std::vector<float> vbuffer(size, 0.0);
+//	int ret = UAI_SpectrometerDataOneshotRaw(_handle, _exposure, vbuffer.data(), /*_average*/1);
+//	if (ret == 0x80000005)
+//	{
+//		return false;
+//	}
+//	for (size_t i = 0; i < size; i++)
+//	{
+//		float value = vbuffer[i];
+//
+//		// °²È«×ª»»
+//		if (value < 0.0f)
+//		{
+//			buff[i] = 0;
+//		}
+//		else if (value > 65535.0f)
+//		{
+//			buff[i] = 65535;
+//		}
+//		else
+//		{
+//			buff[i] = static_cast<unsigned short>(std::round(value));
+//		}
+//	}
+//	return true;
+//}
