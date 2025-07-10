@@ -103,7 +103,6 @@ bool CCDTypeSgm30::Connect()
 			}
 		}
 	}
-
 	return false;
 }
 

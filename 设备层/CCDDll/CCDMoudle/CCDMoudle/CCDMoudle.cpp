@@ -42,11 +42,11 @@ API_CCD_Moudle_H bool SDKInit()
 		}
 
 		GlobalShare::g_currentType = StringToCCDType(typeStr);
-		LogPrintInfo("Selected CCD type: " + typeStr);
+		LogPrintInfo("Selected CCD type: {0}",typeStr);
 
 		GlobalShare::g_currentDevice = CCDFactory::CreateDevice(GlobalShare::g_currentType);
 		if (!GlobalShare::g_currentDevice) {
-			LogPrintErr("Failed to create CCD device of type: " + typeStr);
+			LogPrintErr("Failed to create CCD device of type: {0}",typeStr);
 			return false;
 		}
 
@@ -76,7 +76,7 @@ API_CCD_Moudle_H bool SDKInit()
 		return true;
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in InitDll: " + std::string(e.what()));
+		LogPrintErr("Exception in InitDll: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -121,7 +121,7 @@ API_CCD_Moudle_H bool Connect()
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in Connect: " + std::string(e.what()));
+		LogPrintErr("Exception in Connect: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -174,7 +174,7 @@ API_CCD_Moudle_H bool DisConnect()
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in DisConnect: " + std::string(e.what()));
+		LogPrintErr("Exception in DisConnect: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -204,11 +204,11 @@ API_CCD_Moudle_H bool SetExposureTime(double timeMs)
 
 		if (timeMs <= 0) {
 			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_EXPOSURE_TIME,"Invalid exposure time setting");
-			LogPrintErr("Invalid exposure time: " + std::to_string(timeMs));
+			LogPrintErr("Invalid exposure time: {0}" ,timeMs);
 			return false;
 		}
 
-		LogPrintInfo("Setting exposure time to: " + std::to_string(timeMs) + " ms");
+		LogPrintInfo("Setting exposure time to: {0} ms",timeMs);
 		bool result = GlobalShare::g_currentDevice->SetExposureTime(timeMs);
 
 		if (result) {
@@ -222,7 +222,7 @@ API_CCD_Moudle_H bool SetExposureTime(double timeMs)
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in SetExposureTime: " + std::string(e.what()));
+		LogPrintErr("Exception in SetExposureTime: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -258,7 +258,7 @@ API_CCD_Moudle_H bool GetExposureTime(double* timeMs)
 		bool result = GlobalShare::g_currentDevice->GetExposureTime(timeMs);
 
 		if (result) {
-			LogPrintInfo("Current exposure time: " + std::to_string(*timeMs) + " ms");
+			LogPrintInfo("Current exposure time: {0} ms" ,std::to_string(*timeMs));
 		}
 		else {
 			LogPrintErr("Failed to get exposure time");
@@ -268,7 +268,7 @@ API_CCD_Moudle_H bool GetExposureTime(double* timeMs)
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in GetExposureTime: " + std::string(e.what()));
+		LogPrintErr("Exception in GetExposureTime: {0} " ,std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -299,7 +299,7 @@ API_CCD_Moudle_H bool GetPixelNum(int* size)
 		bool result = GlobalShare::g_currentDevice->GetPixelNum(size);
 
 		if (result) {
-			LogPrintInfo("Pixel number: " + std::to_string(*size));
+			LogPrintInfo("Pixel number: {0}",std::to_string(*size));
 		}
 		else {
 			LogPrintErr("Failed to get pixel number");
@@ -309,7 +309,7 @@ API_CCD_Moudle_H bool GetPixelNum(int* size)
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in GetPixelNum: " + std::string(e.what()));
+		LogPrintErr("Exception in GetPixelNum: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
@@ -321,43 +321,324 @@ API_CCD_Moudle_H bool GetPixelNum(int* size)
 API_CCD_Moudle_H bool SetGain(int gain)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-	return false;
+
+	try {
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
+
+		if (!GlobalShare::g_currentDevice) {
+			LogPrintErr("No CCD device available");
+			return false;
+		}
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			LogPrintErr("Device not connected");
+			return false;
+		}
+
+		if (gain <= 0) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_GAIN, "Invalid gain setting");
+			LogPrintErr("Invalid gain: {0}", gain);
+			return false;
+		}
+		LogPrintInfo("Setting gain to: {0}", gain);
+		bool result = GlobalShare::g_currentDevice->SetGain(gain);
+
+		if (result) {
+			LogPrintInfo("Successfully set gain");
+		}
+		else {
+			LogPrintErr("Failed to set gain");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in SetGain: {0}" ,std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in GetPixelNum");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool GetGain(int * gain)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-	return false;
+
+	try {
+		if (!gain)
+		{
+			LogPrintErr("Invalid parameter: gain is null");
+			return false;
+		}
+
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
+
+		if (!GlobalShare::g_currentDevice) {
+			LogPrintErr("No CCD device available");
+			return false;
+		}
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			LogPrintErr("Device not connected");
+			return false;
+		}
+
+		bool result = GlobalShare::g_currentDevice->GetGain(gain);
+
+		if (result) {
+			LogPrintInfo("Current gain: {0}",*gain);
+		}
+		else {
+			LogPrintErr("Failed to get gain");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in GetGain: {0}", std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in GetGain");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool EnableCooling(bool enable)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-	return false;
+
+	try {
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
+
+		if (!GlobalShare::g_currentDevice) {
+			LogPrintErr("No CCD device available");
+			return false;
+		}
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			LogPrintErr("Device not connected");
+			return false;
+		}
+
+		bool result = GlobalShare::g_currentDevice->EnableCooling(enable);
+
+		if (result) {
+			LogPrintInfo("Successfully set EnableCooling");
+		}
+		else {
+			LogPrintErr("Failed to set EnableCooling");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in EnableCooling: {0}", std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in EnableCooling");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool SetCoolingTemperature(double temp)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-	return false;
+
+	try {
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
+
+		if (!GlobalShare::g_currentDevice) {
+			LogPrintErr("No CCD device available");
+			return false;
+		}
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			LogPrintErr("Device not connected");
+			return false;
+		}
+
+		if (temp <= 0 || temp >=25) {
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_TEMPERATURE, "Invalid Temperature setting");
+			LogPrintErr("Invalid Temperature: {0}", temp);
+			return false;
+		}
+		LogPrintInfo("Setting Temperature to: {0}", temp);
+		bool result = GlobalShare::g_currentDevice->SetCoolingTemperature(temp);
+
+		if (result) {
+			LogPrintInfo("Successfully set Temperature");
+		}
+		else {
+			LogPrintErr("Failed to set Temperature");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in SetTemperature: {0}", std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in SetTemperature");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool GetCurrentTemperature(double * temp)
 {
 	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
-	return false;
+
+	try {
+		if (!temp) {
+			LogPrintErr("Invalid parameter: Temperature is null");
+			return false;
+		}
+		if (!GlobalShare::g_initialized) {
+			LogPrintErr("DLL not initialized");
+			return false;
+		}
+
+		if (!GlobalShare::g_currentDevice) {
+			LogPrintErr("No CCD device available");
+			return false;
+		}
+		if (!GlobalShare::g_currentDevice->IsConnected()) {
+			LogPrintErr("Device not connected");
+			return false;
+		}
+
+		bool result = GlobalShare::g_currentDevice->GetCurrentTemperature(temp);
+
+		if (result) {
+			LogPrintInfo("Current Temperature: {0}",*temp);
+		}
+		else {
+			LogPrintErr("Failed to get Temperature");
+		}
+
+		return result;
+
+	}
+	catch (const std::exception& e) {
+		LogPrintErr("Exception in GetTemperature: {0}", std::string(e.what()));
+		return false;
+	}
+	catch (...) {
+		LogPrintErr("Unknown exception in GetTemperature");
+		return false;
+	}
 }
 
 API_CCD_Moudle_H bool DataAcqOneShot(double * pd, int nPixSize)
 {
-	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	return false;
+	//std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
+
+	//try {
+	//	if (!GlobalShare::g_initialized) {
+	//		LogPrintErr("DLL not initialized");
+	//		return false;
+	//	}
+
+	//	if (!GlobalShare::g_currentDevice) {
+	//		LogPrintErr("No CCD device available");
+	//		return false;
+	//	}
+	//	if (!GlobalShare::g_currentDevice->IsConnected()) {
+	//		LogPrintErr("Device not connected");
+	//		return false;
+	//	}
+
+	//	if (gain <= 0) {
+	//		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_GAIN, "Invalid gain setting");
+	//		LogPrintErr("Invalid gain: {0}", gain);
+	//		return false;
+	//	}
+	//	LogPrintInfo("Setting gain to: {0}", gain);
+	//	bool result = GlobalShare::g_currentDevice->SetGain(gain);
+
+	//	if (result) {
+	//		LogPrintInfo("Successfully set gain");
+	//	}
+	//	else {
+	//		LogPrintErr("Failed to set gain");
+	//	}
+
+	//	return result;
+
+	//}
+	//catch (const std::exception& e) {
+	//	LogPrintErr("Exception in SetGain: {0}", std::string(e.what()));
+	//	return false;
+	//}
+	//catch (...) {
+	//	LogPrintErr("Unknown exception in GetPixelNum");
+	//	return false;
+	//}
 }
 
 API_CCD_Moudle_H bool DataAcqOneShotImg(double * pdImg, int * nPixSize)
 {
-	std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
 	return false;
+	//std::lock_guard<std::mutex> lock(GlobalShare::g_mutex);
+
+	//try {
+	//	if (!GlobalShare::g_initialized) {
+	//		LogPrintErr("DLL not initialized");
+	//		return false;
+	//	}
+
+	//	if (!GlobalShare::g_currentDevice) {
+	//		LogPrintErr("No CCD device available");
+	//		return false;
+	//	}
+	//	if (!GlobalShare::g_currentDevice->IsConnected()) {
+	//		LogPrintErr("Device not connected");
+	//		return false;
+	//	}
+
+	//	if (gain <= 0) {
+	//		CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INVALID_GAIN, "Invalid gain setting");
+	//		LogPrintErr("Invalid gain: {0}", gain);
+	//		return false;
+	//	}
+	//	LogPrintInfo("Setting gain to: {0}", gain);
+	//	bool result = GlobalShare::g_currentDevice->SetGain(gain);
+
+	//	if (result) {
+	//		LogPrintInfo("Successfully set gain");
+	//	}
+	//	else {
+	//		LogPrintErr("Failed to set gain");
+	//	}
+
+	//	return result;
+
+	//}
+	//catch (const std::exception& e) {
+	//	LogPrintErr("Exception in SetGain: {0}", std::string(e.what()));
+	//	return false;
+	//}
+	//catch (...) {
+	//	LogPrintErr("Unknown exception in GetPixelNum");
+	//	return false;
+	//}
 }
 
 API_CCD_Moudle_H bool GetSDKVersion(char * version)
@@ -368,7 +649,7 @@ API_CCD_Moudle_H bool GetSDKVersion(char * version)
 		return false;
 	}
 	strncpy_s(version, strlen(MODULE_VERSION) + 1, MODULE_VERSION, strlen(MODULE_VERSION));
-	LogPrintInfo("Retrieved SDK version: " + std::string(MODULE_VERSION));
+	LogPrintInfo("Retrieved SDK version: {0}",std::string(MODULE_VERSION));
 	return true;
 }
 
@@ -402,7 +683,7 @@ API_CCD_Moudle_H bool SDKCleanup()
 
 	}
 	catch (const std::exception& e) {
-		LogPrintErr("Exception in UnInitDll: " + std::string(e.what()));
+		LogPrintErr("Exception in UnInitDll: {0}",std::string(e.what()));
 		return false;
 	}
 	catch (...) {
