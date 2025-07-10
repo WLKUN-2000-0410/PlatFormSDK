@@ -591,13 +591,13 @@ API_CCD_Moudle_H bool ZLX_DataAcqOneShot(unsigned short *pd, unsigned long  nPix
 			return false;
 		}
 
-		LogPrintInfo("Starting single-shot data acquisition, pixel count: {0}", devicePixelNum);
+//		LogPrintInfo("Starting single-shot data acquisition, pixel count: {0}", devicePixelNum);
 
 		// 执行单次数据采集
 		bool result = GlobalShare::g_currentDevice->DataAcqOneShot(pd, nPixSize);
 
 		if (result) {
-			LogPrintInfo("Successfully completed single-shot data acquisition");
+//			LogPrintInfo("Successfully completed single-shot data acquisition");
 		}
 		else {
 			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_ACQUISITION_FAILED, "Data acquisition failed");

@@ -227,7 +227,7 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 		}
 
 		// 记录采集成功
-		LogPrintInfo("Virtual CCD: Generated {0} pixels of dynamic sin(x) half-period data with random variations", size);
+	//	LogPrintInfo("Virtual CCD: Generated {0} pixels of dynamic sin(x) half-period data with random variations", size);
 		return true;
 
 	}
