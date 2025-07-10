@@ -26,11 +26,11 @@ typedef enum
 	API_EXT_START = 0x80000000
 } ERRORCODE;
 
-//DLL_API ERRORCODE UAI_SpectrometerSetTriggerIO(void*, unsigned int,unsigned int, unsigned int);
+//DLL_API ERRORCODE UAI_SpectrometerSetTriggerGroupIntegrationTime(void*, unsigned int, unsigned int*);
 
-
-
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_infp3_inUI4);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUIp3);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inFp4);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inUI4);
 typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5);
 typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5);
 typedef ERRORCODE(*DLL_OutER_inVp1_inUCp2_inUI3_inUI4);

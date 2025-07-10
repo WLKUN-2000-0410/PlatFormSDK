@@ -22,7 +22,7 @@ public:
 
 private:
 	bool   initDll();
-	void   loadDllFun();
+	bool   loadDllFun();
 private:
 	HINSTANCE	Handle;      
 	double		m_exposureTime; 
@@ -31,22 +31,25 @@ private:
 	bool		m_isConnected;   
 
 
-	DLL_OutER_inUI1_inUI2_inUIp3				UAI_SpectrometerGetDeviceAmount;
-	DLL_OutER_inUI1_inVpp2_inUI3_inUI4			UAI_SpectrometerOpen;
-	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSizeRaw;
-	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetExternalPort;
-	DLL_OutER_inVp1								UAI_SpectrometerClose;
-	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetIntegrationTime;
-	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetIntegrationTime;
-	DLL_OutER_inVp1_inUI2_infp3_inUI4			UAI_SpectrometerDataOneshotRaw;
-	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerGetUserRom;
-	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerSetUserRom;
-	DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5    UAI_SpectromoduleGetIntensityCalibration;
-	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSize;
-	DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5		UAI_SpectromoduleSetIntensityCalibration;
-	DLL_OutER_inVp1_inUI2						UAI_SpectrometerBlockModeStartStop;
-	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetExternalPort;
-	DLL_OutER_inVp1_inUI2_inUI3_inUI4			UAI_SpectrometerSetTriggerIO;
+	DLL_OutER_inUI1_inUI2_inUIp3				UAI_SpectrometerGetDeviceAmount = nullptr;
+	DLL_OutER_inUI1_inVpp2_inUI3_inUI4			UAI_SpectrometerOpen = nullptr;
+	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSizeRaw = nullptr;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetExternalPort = nullptr;
+	DLL_OutER_inVp1								UAI_SpectrometerClose = nullptr;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerSetIntegrationTime = nullptr;
+	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetIntegrationTime = nullptr;
+	DLL_OutER_inVp1_inUI2_infp3_inUI4			UAI_SpectrometerDataOneshotRaw = nullptr;
+	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerGetUserRom = nullptr;
+	DLL_OutER_inVp1_inUCp2_inUI3_inUI4			UAI_SpectrometerSetUserRom = nullptr;
+	DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5    UAI_SpectromoduleGetIntensityCalibration = nullptr;
+	DLL_OutER_inVp1_inUSp2						UAI_SpectromoduleGetFrameSize = nullptr;
+	DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5		UAI_SpectromoduleSetIntensityCalibration = nullptr;
+	DLL_OutER_inVp1_inUI2						UAI_SpectrometerBlockModeStartStop = nullptr;
+	DLL_OutER_inVp1_inUIp2						UAI_SpectrometerGetExternalPort = nullptr;
+	DLL_OutER_inVp1_inUI2_inUI3_inUI4			UAI_SpectrometerSetTriggerIO = nullptr;
+	DLL_OutER_inVp1_inUI2_inUI3_inFp4           DLI_SpectrometerCheckDoneAndGetTriggerData = nullptr;
+	DLL_OutER_inVp1_inUI2_inUIp3				UAI_SpectrometerSetTriggerGroupIntegrationTime = nullptr;
+
 
 
 };
