@@ -6,6 +6,24 @@
 
 CCDTypeSgm30::CCDTypeSgm30() : m_exposureTime(100.0), m_temperature(20.5), m_gain(1), m_isConnected(false), Handle(nullptr)
 {
+	UAI_SpectrometerGetDeviceAmount = nullptr;
+	UAI_SpectrometerOpen = nullptr;
+	UAI_SpectromoduleGetFrameSizeRaw = nullptr;
+	UAI_SpectrometerSetExternalPort = nullptr;
+	UAI_SpectrometerClose = nullptr;
+	UAI_SpectrometerSetIntegrationTime = nullptr;
+	UAI_SpectrometerGetIntegrationTime = nullptr;
+	UAI_SpectrometerDataOneshotRaw = nullptr;
+	UAI_SpectrometerGetUserRom = nullptr;
+	UAI_SpectrometerSetUserRom = nullptr;
+	UAI_SpectromoduleGetIntensityCalibration = nullptr;
+	UAI_SpectromoduleGetFrameSize = nullptr;
+	UAI_SpectromoduleSetIntensityCalibration = nullptr;
+	UAI_SpectrometerBlockModeStartStop = nullptr;
+	UAI_SpectrometerGetExternalPort = nullptr;
+	UAI_SpectrometerSetTriggerIO = nullptr;
+	DLI_SpectrometerCheckDoneAndGetTriggerData = nullptr;
+	UAI_SpectrometerSetTriggerGroupIntegrationTime = nullptr;
 }
 
 
@@ -31,13 +49,6 @@ bool CCDTypeSgm30::Initialize(const CCDConfig & config)
 			return false;
 		}
 		file.close();
-		//// 加载DLL
-		//HMODULE hDll = LoadLibraryA(it->c_str());
-		//if (!hDll) {
-		//	LogPrintErr("Failed to load DLL: ", *it);
-		//	return false;
-		//}
-		//m_dlls.push_back(hDll);
 	}
 	if (initDll())
 	{
@@ -57,27 +68,84 @@ bool CCDTypeSgm30::IsConnected()
 
 bool CCDTypeSgm30::Connect()
 {
+	unsigned int status, device_num, i;
+	//get compatible VID and PID
+	unsigned int buffersize = 2;
+	unsigned int VIDPID[4];
+	//VIDPID = new unsigned int [4];
+	VIDPID[0] = 4292;
+	VIDPID[1] = 60001;
+	VIDPID[2] = 1592;
+	VIDPID[3] = 2732;
+
+	_handle = nullptr;
+
+	//get all device numbers
+	for (unsigned int j = 0; j<buffersize * 2; j = j + 2)
+	{
+		device_num = 0;
+		status = UAI_SpectrometerGetDeviceAmount(VIDPID[j], VIDPID[j + 1], &device_num);
+		if (status == 0 && device_num > 0) // API_SUCCESS == status
+		{
+			for (i = 0; i<device_num; i++)
+			{
+				status = UAI_SpectrometerOpen(i, &_handle, VIDPID[j], VIDPID[j + 1]);
+				if (status == 0)
+				{
+					//pixels
+					UAI_SpectromoduleGetFrameSizeRaw(_handle, &_pixels);
+					_binning_x = 2;
+
+
+					_average = 1;
+					m_isConnected = true;
+
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 
 bool CCDTypeSgm30::DisConnect()
 {
-	return false;
+	auto ret = UAI_SpectrometerSetExternalPort(_handle, 0);
+	if (API_SUCCESS != ret) return ret;
+
+	ret = UAI_SpectrometerClose(_handle);
+	if (API_SUCCESS != ret) return ret;
+
+	m_isConnected = false;
+	return API_SUCCESS;
 }
 
 bool CCDTypeSgm30::SetExposureTime(double timeMs)
 {
-	return false;
+	if (!m_isConnected) return false;
+	int us = timeMs*1e3;
+	return (UAI_SpectrometerSetIntegrationTime(_handle, us) == API_SUCCESS);
 }
 
 bool CCDTypeSgm30::GetExposureTime(double * timeMs)
 {
+	if (!m_isConnected) return false;
+	unsigned int us = 0;
+	if (API_SUCCESS == UAI_SpectrometerGetIntegrationTime(_handle, &us))
+	{
+		_exposure = us;
+		*timeMs = us / 1000.0;
+		return true;
+	}
 	return false;
 }
 
 bool CCDTypeSgm30::GetPixelNum(int * size)
 {
-	return false;
+	if (!m_isConnected) return false;
+	*size = _pixels;
+	return true;
 }
 
 bool CCDTypeSgm30::initDll()
@@ -93,53 +161,9 @@ bool CCDTypeSgm30::initDll()
 	return true;
 }
 
-bool CCDTypeSgm30::loadDllFun()
+
+void CCDTypeSgm30::loadDllFun()
 {
-	if (!Handle) 
-	{
-		return false;
-	}
-
-	// 定义函数信息结构
-	struct FunctionInfo {
-		void** funcPtr;
-		const char* funcName;
-		const char* funcType;
-	};
-
-	// 函数列表
-	FunctionInfo functions[] = {
-		{ (void**)&UAI_SpectrometerGetDeviceAmount, "UAI_SpectrometerGetDeviceAmount", "DLL_OutER_inUI1_inUI2_inUIp3" },
-		{ (void**)&UAI_SpectrometerOpen, "UAI_SpectrometerOpen", "DLL_OutER_inUI1_inVpp2_inUI3_inUI4" },
-		{ (void**)&UAI_SpectromoduleGetFrameSizeRaw, "UAI_SpectromoduleGetFrameSizeRaw", "DLL_OutER_inVp1_inUSp2" },
-		{ (void**)&UAI_SpectrometerSetExternalPort, "UAI_SpectrometerSetExternalPort", "DLL_OutER_inVp1_inUI2" },
-		{ (void**)&UAI_SpectrometerClose, "UAI_SpectrometerClose", "DLL_OutER_inVp1" },
-		{ (void**)&UAI_SpectrometerSetIntegrationTime, "UAI_SpectrometerSetIntegrationTime", "DLL_OutER_inVp1_inUI2" },
-		{ (void**)&UAI_SpectrometerGetIntegrationTime, "UAI_SpectrometerGetIntegrationTime", "DLL_OutER_inVp1_inUIp2" },
-		{ (void**)&UAI_SpectrometerDataOneshotRaw, "UAI_SpectrometerDataOneshotRaw", "DLL_OutER_inVp1_inUI2_infp3_inUI4" },
-		{ (void**)&UAI_SpectrometerGetUserRom, "UAI_SpectrometerGetUserRom", "DLL_OutER_inVp1_inUCp2_inUI3_inUI4" },
-		{ (void**)&UAI_SpectrometerSetUserRom, "UAI_SpectrometerSetUserRom", "DLL_OutER_inVp1_inUCp2_inUI3_inUI4" },
-		{ (void**)&UAI_SpectromoduleGetIntensityCalibration, "UAI_SpectromoduleGetIntensityCalibration", "DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5" },
-		{ (void**)&UAI_SpectromoduleGetFrameSize, "UAI_SpectromoduleGetFrameSize", "DLL_OutER_inVp1_inUSp2" },
-		{ (void**)&UAI_SpectromoduleSetIntensityCalibration, "UAI_SpectromoduleSetIntensityCalibration", "DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5" },
-		{ (void**)&UAI_SpectrometerBlockModeStartStop, "UAI_SpectrometerBlockModeStartStop", "DLL_OutER_inVp1_inUI2" },
-		{ (void**)&UAI_SpectrometerGetExternalPort, "UAI_SpectrometerGetExternalPort", "DLL_OutER_inVp1_inUIp2" },
-		{ (void**)&UAI_SpectrometerSetTriggerIO, "UAI_SpectrometerSetTriggerIO", "DLL_OutER_inVp1_inUI2_inUI3_inUI4" },
-		{ (void**)&DLI_SpectrometerCheckDoneAndGetTriggerData, "DLI_SpectrometerCheckDoneAndGetTriggerData", "DLL_OutER_inVp1_inUI2_inUI3_inFp4" },
-		{ (void**)&UAI_SpectrometerSetTriggerGroupIntegrationTime, "UAI_SpectrometerSetTriggerGroupIntegrationTime", "DLL_OutER_inVp1_inUI2_inUIp3" }
-	};
-
-	// 批量加载函数
-	for (size_t i = 0; i < sizeof(functions) / sizeof(functions[0]); ++i) {
-		*functions[i].funcPtr = GetProcAddress(Handle, functions[i].funcName);
-		if (!*functions[i].funcPtr) {
-			// 可以在这里添加详细的错误日志
-			// printf("Failed to load function: %s (Type: %s)\n", functions[i].funcName, functions[i].funcType);
-			return false;
-		}
-	}
-
-	return true;
 	UAI_SpectrometerGetDeviceAmount					= (DLL_OutER_inUI1_inUI2_inUIp3)GetProcAddress(Handle, "UAI_SpectrometerGetDeviceAmount");
 	UAI_SpectrometerOpen							= (DLL_OutER_inUI1_inVpp2_inUI3_inUI4)GetProcAddress(Handle, "UAI_SpectrometerOpen");
 	UAI_SpectromoduleGetFrameSizeRaw				= (DLL_OutER_inVp1_inUSp2)GetProcAddress(Handle, "UAI_SpectromoduleGetFrameSizeRaw");
@@ -159,3 +183,4 @@ bool CCDTypeSgm30::loadDllFun()
 	DLI_SpectrometerCheckDoneAndGetTriggerData      = (DLL_OutER_inVp1_inUI2_inUI3_inFp4)GetProcAddress(Handle, "DLI_SpectrometerCheckDoneAndGetTriggerData");
 	UAI_SpectrometerSetTriggerGroupIntegrationTime  = (DLL_OutER_inVp1_inUI2_inUIp3)GetProcAddress(Handle, "UAI_SpectrometerSetTriggerGroupIntegrationTime");
 }
+

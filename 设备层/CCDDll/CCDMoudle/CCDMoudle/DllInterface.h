@@ -28,19 +28,19 @@ typedef enum
 
 //DLL_API ERRORCODE UAI_SpectrometerSetTriggerGroupIntegrationTime(void*, unsigned int, unsigned int*);
 
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUIp3);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inFp4);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inUI4);
-typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5);
-typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUCp2_inUI3_inUI4);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_infp3_inUI4);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUIp2);
-typedef ERRORCODE(*DLL_OutER_inVp1);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUI2);
-typedef ERRORCODE(*DLL_OutER_inVp1_inUSp2);
-typedef ERRORCODE(*DLL_OutER_inUI1_inVpp2_inUI3_inUI4);
-typedef ERRORCODE(*DLL_OutER_inUI1_inUI2_inUIp3);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUIp3)(void*, unsigned int, unsigned int*);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inFp4)(void*, unsigned int, unsigned int, float*);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_inUI3_inUI4)(void*, unsigned int, unsigned int, unsigned int);
+typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUI4_inD5)(void*, double *, unsigned short, unsigned int, double);
+typedef ERRORCODE(*DLL_OutER_inVp1_inDp2_inUS3_inUIp4_inDp5)(void*, double *, unsigned short *, unsigned int *, double *);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUCp2_inUI3_inUI4)(void*, unsigned char *, unsigned int, unsigned int);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2_infp3_inUI4)(void*, unsigned int, float *, unsigned int);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUIp2)(void*, unsigned int *);
+typedef ERRORCODE(*DLL_OutER_inVp1)(void*);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUI2)(void*, unsigned int);
+typedef ERRORCODE(*DLL_OutER_inVp1_inUSp2)(void*, unsigned short *);
+typedef ERRORCODE(*DLL_OutER_inUI1_inVpp2_inUI3_inUI4)(unsigned int, void**, unsigned int, unsigned int);
+typedef ERRORCODE(*DLL_OutER_inUI1_inUI2_inUIp3)(unsigned int, unsigned int, unsigned int*);
 typedef bool(*DLL_OutB_inI1_inFp2_inFp3_inI4_inFp5_inFp6_inI7_inFp8_inFp9_inIp10)(int, float*, float*, int, float*, float*, int, float*, float*, int*);
 typedef bool(*DLL_OutB_inI1_inF2_inI3_inI4_inF5_inF6_inF7_inI8_inF9_inFp10_inIp11)(int, float, int, int, float, float, float, int, float, float*, int*);
 typedef int(*DLL_OutI_inIp)(int*);
