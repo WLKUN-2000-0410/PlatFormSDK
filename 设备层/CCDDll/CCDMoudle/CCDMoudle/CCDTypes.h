@@ -26,7 +26,7 @@ struct CCDConfig
 	double defaultExposureTime;
 	double defaulttemperature;
 	int    defaultgain;
-
+	std::vector<int>  GainRange;
 	CCDConfig()
 	{
 		type = CCDType::VIRTUAL;
@@ -34,6 +34,7 @@ struct CCDConfig
 		defaultExposureTime = 100.0;
 		defaulttemperature = 20.5;
 		defaultgain = 1;
+		GainRange.swap(std::vector<int>());
 	}
 };
 

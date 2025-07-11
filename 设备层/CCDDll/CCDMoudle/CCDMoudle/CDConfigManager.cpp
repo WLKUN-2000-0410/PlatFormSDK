@@ -126,6 +126,7 @@ bool CCDConfigManager::EnsureConfigFile()
 	sgm30Config.defaultExposureTime = 100.0;
 	sgm30Config.defaulttemperature = 20.5;
 	sgm30Config.defaultgain = 1;
+	sgm30Config.GainRange.push_back(1);
 	configMgr.SetDeviceConfig(CCDType::SGM30, sgm30Config);
 
 	//CCDConfig c2Config(CCDType::C2);
@@ -178,6 +179,19 @@ bool CCDConfigManager::ParseConfigFile(const std::string & content)
 				else
 				{
 					LogPrintErr("json {0} file : 'Dependentfiles' was not found", typeStr);
+					return false;
+				}
+				if (config.find("GainRange") != config.end() && config["GainRange"].is_array())
+				{
+					cfg.GainRange.clear();
+					for (json::const_iterator file_it = config["GainRange"].begin();
+						file_it != config["GainRange"].end(); ++file_it) {
+						cfg.GainRange.push_back(file_it->get<int>());
+					}
+				}
+				else
+				{
+					LogPrintErr("json {0} file : 'GainRange' was not found", typeStr);
 					return false;
 				}
 				// ½âÎö DefaultExposureTime
@@ -245,6 +259,11 @@ std::string CCDConfigManager::GenerateConfigContent() const
 		for (std::vector<std::string>::const_iterator file_it = it->second.Dependentfiles.begin();
 			file_it != it->second.Dependentfiles.end(); ++file_it) {
 			cfg["Dependentfiles"].push_back(*file_it);
+		}
+		cfg["GainRange"] = json::array();
+		for (std::vector<int>::const_iterator file_it = it->second.GainRange.begin();
+			file_it != it->second.GainRange.end(); ++file_it) {
+			cfg["GainRange"].push_back(*file_it);
 		}
 		cfg["DefaultExposureTime"] = it->second.defaultExposureTime;
 		cfg["Defaulttemperature"] = it->second.defaulttemperature;

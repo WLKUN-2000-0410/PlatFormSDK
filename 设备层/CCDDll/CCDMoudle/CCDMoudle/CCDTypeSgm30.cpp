@@ -139,7 +139,8 @@ bool CCDTypeSgm30::DisConnect()
 bool CCDTypeSgm30::SetExposureTime(double timeMs)
 {
 	if (!m_isConnected) return false;
-	int us = timeMs*1e3;
+	m_exposureTime = timeMs*1e3;
+	unsigned int us = m_exposureTime;
 	return (UAI_SpectrometerSetIntegrationTime(_handle, us) == API_SUCCESS);
 }
 
@@ -149,7 +150,7 @@ bool CCDTypeSgm30::GetExposureTime(double * timeMs)
 	unsigned int us = 0;
 	if (API_SUCCESS == UAI_SpectrometerGetIntegrationTime(_handle, &us))
 	{
-		_exposure = us;
+		m_exposureTime = us;
 		*timeMs = us / 1000.0;
 		return true;
 	}
@@ -209,7 +210,8 @@ bool CCDTypeSgm30::DataAcqOneShot(unsigned short * buff, unsigned long size)
 	}
 
 	std::vector<float> vbuffer(size, 0.0);
-	int ret = UAI_SpectrometerDataOneshotRaw(_handle, _exposure, vbuffer.data(), /*_average*/1);
+	unsigned int exptmp = m_exposureTime;
+	int ret = UAI_SpectrometerDataOneshotRaw(_handle, exptmp, vbuffer.data(), /*_average*/1);
 	if (ret == 0x80000005)
 	{
 		return false;

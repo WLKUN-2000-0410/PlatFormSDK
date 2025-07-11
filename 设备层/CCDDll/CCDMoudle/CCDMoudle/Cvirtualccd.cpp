@@ -106,33 +106,7 @@ bool Cvirtualccd::GetCurrentTemperature(double* temp) {
 	*temp = m_temperature;
 	return true;
 }
-/*
-bool Cvirtualccd::DataAcqOneShot(double* pd, int nPixSize) {
-	if (!pd || nPixSize <= 0 || nPixSize > m_pixelNum) {
-		LogPrintErr("Invalid parameters for DataAcqOneShot: pd=" + std::to_string((uintptr_t)pd) +
-			", nPixSize=" + std::to_string(nPixSize));
-		return false;
-	}
-	for (int i = 0; i < nPixSize; ++i) {
-		pd[i] = static_cast<double>(i % 256); // Simulated data
-	}
-	LogPrintInfo("VIRTUAL device acquired one-shot data, size: " + std::to_string(nPixSize));
-	return true;
-}
 
-bool Cvirtualccd::DataAcqOneShotImg(double* pdImg, int* nPixSize) {
-	if (!pdImg || !nPixSize || *nPixSize <= 0 || *nPixSize > m_pixelNum) {
-		LogPrintErr("Invalid parameters for DataAcqOneShotImg: pdImg=" + std::to_string((uintptr_t)pdImg) +
-			", nPixSize=" + std::to_string(*nPixSize));
-		return false;
-	}
-	for (int i = 0; i < *nPixSize; ++i) {
-		pdImg[i] = static_cast<double>(i % 256); // Simulated image data
-	}
-	LogPrintInfo("VIRTUAL device acquired one-shot image, size: " + std::to_string(*nPixSize));
-	return true;
-}
-*/
 bool Cvirtualccd::GetPixelNum(int* size) {
 	if (!size) {
 		LogPrintErr("Null pointer for pixel number");
@@ -216,7 +190,7 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 		// 模拟温度对数据的影响（如果启用制冷）
 		if (m_coolingEnabled) {
 			// 温度越低，噪声越小，信号质量越好
-			double tempFactor = 1.0 - (25.0 - m_exposureTime) / 25.0 * 0.1;  // 最多10%的改善
+			double tempFactor = 1.0 - (25.0 - m_temperature) / 25.0 * 0.1;  // 最多10%的改善
 
 			for (unsigned long i = 0; i < size; ++i) {
 				double adjustedValue = buff[i] * tempFactor;
@@ -225,9 +199,6 @@ bool Cvirtualccd::DataAcqOneShot(unsigned short * buff, unsigned long size)
 				buff[i] = static_cast<unsigned short>(adjustedValue);
 			}
 		}
-
-		// 记录采集成功
-	//	LogPrintInfo("Virtual CCD: Generated {0} pixels of dynamic sin(x) half-period data with random variations", size);
 		return true;
 
 	}
