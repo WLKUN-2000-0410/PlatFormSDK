@@ -57,6 +57,9 @@ API_CCD_Moudle_H bool ZLX_SDKInit()
 			GlobalShare::g_currentDevice.reset();
 
 			LogPrintInfo("Switch to the virtual device.");
+
+			CCDConfigManager::GetInstance().SetLastError(SDK_ERROR_INIT_DLL, "Switch to the virtual device.");
+
 			GlobalShare::g_currentType = CCDType::VIRTUAL;
 			typeStr = "VIRTUAL";
 			GlobalShare::g_currentDevice = CCDFactory::CreateDevice(GlobalShare::g_currentType);
@@ -705,6 +708,8 @@ API_CCD_Moudle_H const char* ZLX_GetErrorMessage(SDKErrorCode errorCode) {
 		return "Invalid exposure time setting";
 	case SDK_ERROR_BUFFER_TOO_SMALL:
 		return "Buffer too small";
+	case SDK_ERROR_INIT_DLL:
+		return  "There is a problem with initialization";
 	case SDK_ERROR_UNKNOWN:
 	default:
 		return "Unknown error";
