@@ -115,7 +115,7 @@ bool CCDConfigManager::EnsureConfigFile()
 	LogPrintInfo("No config file found, creating default config");
 
 	// 设置全局默认参数
-	configMgr.SetGlobalParameter("DefaultCCDType", "SGM30");
+	configMgr.SetGlobalParameter("DefaultCCDType", "A3");
 
 	// 设置各设备默认配置
 	CCDConfig  sgm30Config;
@@ -136,6 +136,15 @@ bool CCDConfigManager::EnsureConfigFile()
 	//c2Config.defaultExposureTime = 50.0;
 	//c2Config.pixelNum = 1024;
 	//configMgr.SetDeviceConfig(CCDType::C2, c2Config);
+
+	CCDConfig a3Config;
+	a3Config.type = CCDType::A3;
+	a3Config.Dependentfiles.push_back("dfield.dll");
+	a3Config.defaultExposureTime = 50.0;  // 50 ms
+	a3Config.defaulttemperature = -10.0; // -10 C
+	a3Config.defaultgain = 1;
+	configMgr.SetDeviceConfig(CCDType::A3, a3Config);
+
 
 	// 保存默认配置
 	return configMgr.SaveConfig("./Ccd_config.json");
