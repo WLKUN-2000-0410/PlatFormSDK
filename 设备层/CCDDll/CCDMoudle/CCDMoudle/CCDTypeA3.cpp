@@ -107,9 +107,9 @@ bool CCDTypeA3::Connect()
 	m_dfield_usb_mode(false);
 
 	//这个地方com口先写死, 后续可以改成轮询,或从配置文件中读
-	m_deviceId = m_dfield_open("COM4");
+	m_deviceId = m_dfield_open("COM10");
 
-	if (m_deviceId < 0) {
+	if (m_deviceId <= 0) {
 		LogPrintErr("Failed to open A3 device.");
 		return false;
 	}
